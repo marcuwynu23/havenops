@@ -30,7 +30,7 @@ export default function ClientPortal() {
     <>
       <PageHeader
         title="My bookings"
-        description="Request service and track your jobs."
+        description="Request service and track your bookings."
       />
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Button
@@ -44,9 +44,9 @@ export default function ClientPortal() {
       </div>
       {error ? <Alert className="mb-4">{error}</Alert> : null}
       <Card>
-        <CardTitle>Your jobs</CardTitle>
+        <CardTitle>Your bookings</CardTitle>
         {loading ? (
-          <div aria-busy aria-label="Loading jobs">
+          <div aria-busy aria-label="Loading bookings">
             <ClientPortalJobsSkeleton />
           </div>
         ) : (
