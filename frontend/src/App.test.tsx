@@ -1,7 +1,19 @@
+import { QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import App from "./App";
+import { createTestQueryClient } from "./lib/createQueryClient";
+
+function renderWithProviders(ui: ReactElement, initialEntries: string[]) {
+  const client = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
 
 describe("App", () => {
   beforeEach(() => {
@@ -18,11 +30,7 @@ describe("App", () => {
   });
 
   it("shows landing for unauthenticated users at /", async () => {
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <App />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<App />, ["/"]);
     await waitFor(() => {
       expect(
         screen.getByRole("heading", {
@@ -33,11 +41,7 @@ describe("App", () => {
   });
 
   it("shows sign-in chooser at /login", async () => {
-    render(
-      <MemoryRouter initialEntries={["/login"]}>
-        <App />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<App />, ["/login"]);
     await waitFor(() => {
       expect(
         screen.getByRole("heading", { name: "Sign in" }),
@@ -49,11 +53,7 @@ describe("App", () => {
   });
 
   it("shows client sign-in at /login/client", async () => {
-    render(
-      <MemoryRouter initialEntries={["/login/client"]}>
-        <App />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<App />, ["/login/client"]);
     await waitFor(() => {
       expect(
         screen.getByRole("heading", { name: "Client sign in" }),
