@@ -12,6 +12,7 @@ export { Field, type FieldProps } from "./Field";
 export { FormGrid } from "./FormGrid";
 export { RowActions } from "./RowActions";
 export { Input, type InputProps } from "./Input";
+export { Skeleton } from "./Skeleton";
 export { Muted } from "./Muted";
 export { PageHeader, type PageHeaderProps } from "./PageHeader";
 export {

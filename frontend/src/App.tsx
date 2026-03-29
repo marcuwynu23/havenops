@@ -7,6 +7,10 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { AdminShell, type NavItemConfig } from "./components/layout/AdminShell";
+import {
+  HydrateCenterSkeleton,
+  RouteFallbackSkeleton,
+} from "./components/skeletons/PageContentSkeletons";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { Button } from "./components/ui";
 import { ThemePreferenceControl } from "./components/ThemePreferenceControl";
@@ -32,11 +36,7 @@ const EmployeesPage = lazy(() => import("./pages/admin/EmployeesPage"));
 const EmployeeApp = lazy(() => import("./pages/employee/EmployeeApp"));
 const ClientPortal = lazy(() => import("./pages/client/ClientPortal"));
 
-const routeFallback = (
-  <div className="flex min-h-screen items-center justify-center bg-background text-muted">
-    Loading…
-  </div>
-);
+const routeFallback = <RouteFallbackSkeleton />;
 
 const ADMIN_NAV: NavItemConfig[] = [
   {
@@ -163,11 +163,7 @@ function CatchAllRedirect() {
   }, [hydrate]);
 
   if (!hydrated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted">
-        Loading…
-      </div>
-    );
+    return <HydrateCenterSkeleton />;
   }
   if (!token || !user) {
     return <Navigate to="/" replace />;
