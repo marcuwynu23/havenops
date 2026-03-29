@@ -3,6 +3,7 @@ import { type FormEvent, useState } from "react";
 import type { Employee } from "../../api";
 import { createEmployee, setEmployeeActive } from "../../api";
 import { Modal } from "../../components/Modal";
+import { EmployeesTableSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import {
   Alert,
   Badge,
@@ -123,15 +124,15 @@ export default function EmployeesPage() {
         </Button>
       </div>
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
-      {employeesQ.isPending ? (
-        <Muted className="mb-4">Loading team…</Muted>
-      ) : null}
       {toggleError ? <Alert className="mb-4">{toggleError}</Alert> : null}
-      <Card>
-        <CardTitle>Team</CardTitle>
-        {employees.length === 0 ? (
-          <Muted>No employees yet. Use Add employee to invite staff.</Muted>
-        ) : (
+      {employeesQ.isPending ? (
+        <EmployeesTableSkeleton />
+      ) : (
+        <Card>
+          <CardTitle>Team</CardTitle>
+          {employees.length === 0 ? (
+            <Muted>No employees yet. Use Add employee to invite staff.</Muted>
+          ) : (
           <>
             <TableDesktop>
               <Table>
@@ -198,7 +199,8 @@ export default function EmployeesPage() {
             </TableMobileList>
           </>
         )}
-      </Card>
+        </Card>
+      )}
 
       <Modal
         open={modalOpen}

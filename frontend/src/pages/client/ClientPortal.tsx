@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import BookingForm from "../../components/BookingForm";
 import JobTable from "../../components/JobTable";
-import { Alert, Card, CardTitle, Muted, PageHeader } from "../../components/ui";
+import { TableRowsSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
 import {
   useClientsQuery,
   useJobsQuery,
@@ -30,19 +31,24 @@ export default function ClientPortal() {
         description="Request service and track your jobs."
       />
       {error ? <Alert className="mb-4">{error}</Alert> : null}
-      {loading ? <Muted className="mb-4">Loading…</Muted> : null}
       <Card>
         <CardTitle>New booking</CardTitle>
         <BookingForm />
       </Card>
       <Card>
         <CardTitle>Your jobs</CardTitle>
-        <JobTable
-          jobs={jobs}
-          clients={clientMap}
-          employees={[]}
-          mode="client"
-        />
+        {loading ? (
+          <div aria-busy aria-label="Loading jobs">
+            <TableRowsSkeleton rows={7} />
+          </div>
+        ) : (
+          <JobTable
+            jobs={jobs}
+            clients={clientMap}
+            employees={[]}
+            mode="client"
+          />
+        )}
       </Card>
     </>
   );

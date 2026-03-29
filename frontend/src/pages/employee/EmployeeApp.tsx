@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import JobTable from "../../components/JobTable";
-import { Alert, Card, CardTitle, Muted, PageHeader } from "../../components/ui";
+import { JobTableCardSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
 import {
   useClientsQuery,
   useJobsQuery,
@@ -31,16 +32,19 @@ export default function EmployeeApp() {
         description="Jobs assigned to you. Update status as you work."
       />
       {error ? <Alert className="mb-4">{error}</Alert> : null}
-      {loading ? <Muted className="mb-4">Loading jobs…</Muted> : null}
-      <Card>
-        <CardTitle>Assigned work</CardTitle>
-        <JobTable
-          jobs={jobs}
-          clients={clientMap}
-          employees={employees}
-          mode="employee"
-        />
-      </Card>
+      {loading ? (
+        <JobTableCardSkeleton titleWidth="w-40" />
+      ) : (
+        <Card>
+          <CardTitle>Assigned work</CardTitle>
+          <JobTable
+            jobs={jobs}
+            clients={clientMap}
+            employees={employees}
+            mode="employee"
+          />
+        </Card>
+      )}
     </>
   );
 }

@@ -1,14 +1,7 @@
 import { useMemo } from "react";
 import JobTable from "../../components/JobTable";
-import {
-  Alert,
-  Card,
-  CardTitle,
-  Muted,
-  PageHeader,
-  StatCard,
-  StatsGrid,
-} from "../../components/ui";
+import { DashboardContentSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { Alert, Card, CardTitle, PageHeader, StatCard, StatsGrid } from "../../components/ui";
 import {
   useClientsQuery,
   useEmployeesQuery,
@@ -61,27 +54,30 @@ export default function Dashboard() {
       <PageHeader title="Dashboard" />
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
       {loading ? (
-        <Muted className="mb-4">Loading dashboard…</Muted>
-      ) : null}
-      <StatsGrid>
-        <StatCard value={clients.length} label="Clients" />
-        <StatCard
-          value={employees.filter((e) => e.is_active).length}
-          label="Active staff"
-        />
-        <StatCard value={jobs.length} label="All jobs" />
-        <StatCard value={counts.in_progress ?? 0} label="In progress" />
-        <StatCard value={counts.done ?? 0} label="Completed" />
-      </StatsGrid>
-      <Card>
-        <CardTitle>Recent jobs</CardTitle>
-        <JobTable
-          jobs={recent}
-          clients={clientMap}
-          employees={employees}
-          mode="admin"
-        />
-      </Card>
+        <DashboardContentSkeleton />
+      ) : (
+        <>
+          <StatsGrid>
+            <StatCard value={clients.length} label="Clients" />
+            <StatCard
+              value={employees.filter((e) => e.is_active).length}
+              label="Active staff"
+            />
+            <StatCard value={jobs.length} label="All jobs" />
+            <StatCard value={counts.in_progress ?? 0} label="In progress" />
+            <StatCard value={counts.done ?? 0} label="Completed" />
+          </StatsGrid>
+          <Card>
+            <CardTitle>Recent jobs</CardTitle>
+            <JobTable
+              jobs={recent}
+              clients={clientMap}
+              employees={employees}
+              mode="admin"
+            />
+          </Card>
+        </>
+      )}
     </>
   );
 }

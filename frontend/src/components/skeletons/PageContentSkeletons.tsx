@@ -3,9 +3,9 @@ import { Skeleton } from "../ui/Skeleton";
 import { StatsGrid } from "../ui/StatsGrid";
 import { cn } from "../../lib/cn";
 
-function TableBodySkeleton({ rows = 6 }: { rows?: number }) {
+export function TableRowsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" aria-hidden>
       {Array.from({ length: rows }, (_, i) => (
         <Skeleton key={i} className="h-11 w-full rounded-md" />
       ))}
@@ -38,7 +38,7 @@ export function RouteFallbackSkeleton() {
       </StatsGrid>
       <Card className="mb-0">
         <Skeleton className="mb-3 h-5 w-40 sm:mb-4 sm:h-6" />
-        <TableBodySkeleton rows={7} />
+        <TableRowsSkeleton rows={7} />
       </Card>
     </div>
   );
@@ -85,7 +85,7 @@ export function DashboardContentSkeleton() {
       </StatsGrid>
       <Card className="mb-0">
         <Skeleton className="mb-3 h-5 w-36 sm:mb-4 sm:h-6" />
-        <TableBodySkeleton rows={8} />
+        <TableRowsSkeleton rows={8} />
       </Card>
     </div>
   );
@@ -101,7 +101,7 @@ export function JobsContentSkeleton() {
       </div>
       <Card className="mb-0">
         <Skeleton className="mb-4 h-5 w-28 sm:h-6" />
-        <TableBodySkeleton rows={8} />
+        <TableRowsSkeleton rows={8} />
       </Card>
     </div>
   );
@@ -115,7 +115,7 @@ export function ClientsContentSkeleton() {
         <Skeleton className="h-3 w-full max-w-xl" />
         <Skeleton className="h-3 w-full max-w-lg" />
       </div>
-      <TableBodySkeleton rows={6} />
+      <TableRowsSkeleton rows={6} />
     </Card>
   );
 }
@@ -124,7 +124,7 @@ export function EmployeesTableSkeleton() {
   return (
     <Card className="mb-0" aria-busy aria-label="Loading team">
       <Skeleton className="mb-4 h-5 w-24 sm:h-6" />
-      <TableBodySkeleton rows={6} />
+      <TableRowsSkeleton rows={6} />
     </Card>
   );
 }
@@ -133,7 +133,7 @@ export function JobTableCardSkeleton({ titleWidth = "w-40" }: { titleWidth?: str
   return (
     <Card className="mb-0" aria-busy aria-label="Loading jobs">
       <Skeleton className={cn("mb-4 h-5 sm:h-6", titleWidth)} />
-      <TableBodySkeleton rows={7} />
+      <TableRowsSkeleton rows={7} />
     </Card>
   );
 }

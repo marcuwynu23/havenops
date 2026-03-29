@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ThemePreferenceControl } from "../../components/ThemePreferenceControl";
+import { HydrateCenterSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import { buttonClassName, Card, CardTitle, Muted } from "../../components/ui";
 import { cn } from "../../lib/cn";
 import { roleHome, useAuthStore } from "../../store/authStore";
@@ -37,9 +38,7 @@ export default function LandingPage() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-background text-muted">
-        Loading…
-      </div>
+      <HydrateCenterSkeleton className="min-h-[100dvh] font-sans text-foreground" />
     );
   }
 

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import JobTable from "../../components/JobTable";
-import { Alert, Card, CardTitle, Muted, PageHeader } from "../../components/ui";
+import { JobsContentSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
 import {
   useClientsQuery,
   useEmployeesQuery,
@@ -35,21 +36,26 @@ export default function JobsPage() {
     <>
       <PageHeader title="Jobs" />
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
-      {loading ? <Muted className="mb-4">Loading jobs…</Muted> : null}
-      <p className="mb-4 text-xs leading-relaxed text-muted sm:text-sm sm:leading-normal">
-        Bookings are created by clients from their portal. Jobs without an
-        assignee stay pending until someone is free in that time window; assign
-        manually if needed.
-      </p>
-      <Card>
-        <CardTitle>All jobs</CardTitle>
-        <JobTable
-          jobs={jobs}
-          clients={clientMap}
-          employees={employees}
-          mode="admin"
-        />
-      </Card>
+      {loading ? (
+        <JobsContentSkeleton />
+      ) : (
+        <>
+          <p className="mb-4 text-xs leading-relaxed text-muted sm:text-sm sm:leading-normal">
+            Bookings are created by clients from their portal. Jobs without an
+            assignee stay pending until someone is free in that time window;
+            assign manually if needed.
+          </p>
+          <Card>
+            <CardTitle>All jobs</CardTitle>
+            <JobTable
+              jobs={jobs}
+              clients={clientMap}
+              employees={employees}
+              mode="admin"
+            />
+          </Card>
+        </>
+      )}
     </>
   );
 }
