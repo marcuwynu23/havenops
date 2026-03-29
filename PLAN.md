@@ -267,9 +267,11 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 - Admin pages + `**EmployeeApp**` / `**ClientPortal**` use `**useQuery**`; `**JobTable**`, `**BookingForm**`, `**EmployeesPage**` use `**useMutation**` + `**invalidateQueries**`; removed `**havenopsStore**`
 - Vitest: `**QueryClientProvider**` + `**createTestQueryClient**` in `**App.test.tsx**`
 
-### Phase 6 – Persistence
+### Phase 6 – Persistence — **done**
 
-- SQLite + migrations (or Postgres), map `Store` to database
+- **SQLite** via `modernc.org/sqlite` (pure Go); **`Store`** implementation in `internal/store/sqlite.go` with **`CREATE TABLE IF NOT EXISTS`** migrations on open
+- **`recovery_tokens`** table so password recovery survives restarts
+- **`cmd/server`**: default `havenops.db` (override with `HAVENOPS_SQLITE_PATH`); `HAVENOPS_USE_MEMORY=1` keeps the in-memory store for tests/dev
 
 ### Phase 7 – Desktop & mobile
 
@@ -312,7 +314,7 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 
 ### Local
 
-- Backend: `make run` or `go run ./cmd/server` from `backend/`; optional `HAVENOPS_SEED_DEMO=1`
+- Backend: `make run` or `go run ./cmd/server` from `backend/`; SQLite file `havenops.db` (or `HAVENOPS_SQLITE_PATH`); optional `HAVENOPS_SEED_DEMO=1`; `HAVENOPS_USE_MEMORY=1` for in-memory only
 - Frontend: `npm run dev` from `frontend/`
 - Docker Compose (API + DB) — optional / future when DB lands
 
@@ -345,6 +347,6 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 ## Notes
 
 - Keep the system simple and fast; avoid overengineering for the single-tenant MVP
-- In-memory store: process restart loses data until Phase 6 persistence
+- Default local API uses **SQLite** (`havenops.db`); use `HAVENOPS_USE_MEMORY=1` for ephemeral data
 - Focus on real business usage; Capacitor/Electron follow after web + persistence are stable
 
