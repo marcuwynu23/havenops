@@ -8,7 +8,14 @@ import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "../../lib/cn";
 import { SheetDragHandle, sheetPanelClassName } from "../SheetChrome";
 
-export type NavIcon = "home" | "jobs" | "clients" | "team" | "list" | "booking";
+export type NavIcon =
+  | "home"
+  | "jobs"
+  | "clients"
+  | "team"
+  | "list"
+  | "booking"
+  | "location";
 
 export type NavItemConfig = {
   to: string;
@@ -83,6 +90,17 @@ function iconPaths(name: NavIcon): ReactNode {
           strokeLinejoin="round"
           strokeWidth={1.75}
           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"
+          className={common}
+          fill="none"
+        />
+      );
+    case "location":
+      return (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z"
           className={common}
           fill="none"
         />

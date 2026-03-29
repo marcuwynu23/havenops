@@ -46,17 +46,32 @@ export default function ClientsPage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <Th>Name</Th>
-                      <Th>Phone</Th>
-                      <Th>Address</Th>
+                    <Th>Name</Th>
+                    <Th>Phone</Th>
+                    <Th>Address</Th>
+                    <Th>Coordinates</Th>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {clients.map((c) => (
                       <TableRow key={c.id}>
-                        <Td>{c.name}</Td>
-                        <Td>{c.phone || "—"}</Td>
-                        <Td>{c.address || "—"}</Td>
+                      <Td>{c.name}</Td>
+                      <Td>{c.phone || "—"}</Td>
+                      <Td>{c.address || "—"}</Td>
+                      <Td className="font-mono text-xs">
+                        {c.latitude != null &&
+                        c.longitude != null &&
+                        Number.isFinite(c.latitude) &&
+                        Number.isFinite(c.longitude) ? (
+                          <>
+                            {c.latitude.toFixed(5)}
+                            <br />
+                            {c.longitude.toFixed(5)}
+                          </>
+                        ) : (
+                          "—"
+                        )}
+                      </Td>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -69,6 +84,16 @@ export default function ClientsPage() {
                       <DataField label="Name">{c.name}</DataField>
                       <DataField label="Phone">{c.phone || "—"}</DataField>
                       <DataField label="Address">{c.address || "—"}</DataField>
+                    <DataField label="Coordinates (WGS84)">
+                      {c.latitude != null &&
+                      c.longitude != null &&
+                      Number.isFinite(c.latitude) &&
+                      Number.isFinite(c.longitude) ? (
+                        `${c.latitude.toFixed(5)}, ${c.longitude.toFixed(5)}`
+                      ) : (
+                        "—"
+                      )}
+                    </DataField>
                     </DataFieldList>
                   </TableMobileCard>
                 ))}

@@ -10,6 +10,9 @@ export type Client = {
   name: string;
   phone: string;
   address: string;
+  /** WGS84 when set (from portal map picker). */
+  latitude?: number;
+  longitude?: number;
   created_at: string;
 };
 

@@ -35,6 +35,9 @@ const JobsPage = lazy(() => import("./pages/admin/JobsPage"));
 const EmployeesPage = lazy(() => import("./pages/admin/EmployeesPage"));
 const EmployeeApp = lazy(() => import("./pages/employee/EmployeeApp"));
 const ClientPortal = lazy(() => import("./pages/client/ClientPortal"));
+const ClientLocationPage = lazy(
+  () => import("./pages/client/ClientLocationPage"),
+);
 
 const routeFallback = <RouteFallbackSkeleton />;
 
@@ -71,6 +74,13 @@ const CLIENT_NAV: NavItemConfig[] = [
     label: "My bookings",
     mobileLabel: "Bookings",
     icon: "booking",
+    end: true,
+  },
+  {
+    to: "/portal/location",
+    label: "Location",
+    mobileLabel: "Location",
+    icon: "location",
     end: true,
   },
 ];
@@ -195,6 +205,7 @@ export default function App() {
           </Route>
           <Route path="/portal" element={<ClientGate />}>
             <Route index element={<ClientPortal />} />
+            <Route path="location" element={<ClientLocationPage />} />
           </Route>
         </Route>
 

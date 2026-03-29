@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Client, Employee, Job, JobStatus } from "../api";
 import { patchJobAssign, patchJobStatus } from "../api";
+import { JobSiteBlock } from "./maps/JobSiteBlock";
 import { queryKeys } from "../lib/queryKeys";
 import {
   Alert,
@@ -105,6 +106,7 @@ export default function JobTable({
   }
 
   const showActions = mode !== "client";
+  const showSite = mode !== "client";
   const mutating = statusMutation.isPending || assignMutation.isPending;
 
   return (
@@ -118,6 +120,7 @@ export default function JobTable({
             <TableRow>
               <Th>When</Th>
               <Th>Client</Th>
+              {showSite ? <Th>Site</Th> : null}
               <Th>Service</Th>
               {mode !== "client" ? <Th>Assignee</Th> : null}
               <Th>Status</Th>
@@ -143,6 +146,14 @@ export default function JobTable({
                 <TableRow key={j.id}>
                   <Td>{formatWhen(j.scheduled_at)}</Td>
                   <Td>{client?.name ?? j.client_id}</Td>
+                  {showSite ? (
+                    <Td className="max-w-[1px] align-top">
+                      <JobSiteBlock
+                        client={client}
+                        mapClassName="!aspect-auto h-28 max-h-28 w-full min-w-[10rem]"
+                      />
+                    </Td>
+                  ) : null}
                   <Td>{j.service_type}</Td>
                   {mode !== "client" ? (
                     <Td>{assignee?.name ?? "—"}</Td>
@@ -252,6 +263,14 @@ export default function JobTable({
                 <DataField label="Client">
                   {client?.name ?? j.client_id}
                 </DataField>
+                {showSite ? (
+                  <DataField label="Site">
+                    <JobSiteBlock
+                      client={client}
+                      mapClassName="!aspect-auto h-32 w-full max-w-none"
+                    />
+                  </DataField>
+                ) : null}
                 <DataField label="Service">{j.service_type}</DataField>
                 {mode !== "client" ? (
                   <DataField label="Assignee">

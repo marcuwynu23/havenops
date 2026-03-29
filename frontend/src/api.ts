@@ -19,6 +19,12 @@ export function getAuthToken() {
   return bearerToken;
 }
 
+function authHeaders(): HeadersInit {
+  const h: Record<string, string> = {};
+  if (bearerToken) h.Authorization = `Bearer ${bearerToken}`;
+  return h;
+}
+
 function jsonHeaders(): HeadersInit {
   const h: Record<string, string> = { "Content-Type": "application/json" };
   if (bearerToken) h.Authorization = `Bearer ${bearerToken}`;
@@ -103,6 +109,42 @@ export async function getClients(): Promise<Client[]> {
   const res = await fetch(`${prefix}/clients`, { headers: jsonHeaders() });
   if (!res.ok) throw new Error(await parseError(res));
   return readJSON<Client[]>(res);
+}
+
+export async function patchClientMe(body: {
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  clear_coordinates?: boolean;
+}): Promise<Client> {
+  const res = await fetch(`${prefix}/clients/me`, {
+    method: "PATCH",
+    headers: jsonHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return readJSON<Client>(res);
+}
+
+export async function geocodeForward(q: string): Promise<{
+  lat: number;
+  lon: number;
+  display_name: string;
+}> {
+  const url = `${prefix}/geocode/forward?q=${encodeURIComponent(q)}`;
+  const res = await fetch(url, { headers: authHeaders() });
+  if (!res.ok) throw new Error(await parseError(res));
+  return readJSON(res);
+}
+
+export async function geocodeReverse(
+  lat: number,
+  lon: number,
+): Promise<{ display_name: string }> {
+  const url = `${prefix}/geocode/reverse?lat=${encodeURIComponent(String(lat))}&lon=${encodeURIComponent(String(lon))}`;
+  const res = await fetch(url, { headers: authHeaders() });
+  if (!res.ok) throw new Error(await parseError(res));
+  return readJSON(res);
 }
 
 export async function getEmployees(): Promise<Employee[]> {
