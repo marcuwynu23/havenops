@@ -1,5 +1,11 @@
 node_modules/
 dist/
+havenops.db
+havenops.db-shm
+havenops.db-wal
+*.db
+*.db-shm
+*.db-wal
 *.exe
 *.test.exe
 .env
