@@ -24,9 +24,11 @@ func main() {
 	}
 
 	var st store.Store
+	sqliteMode := false
 	if os.Getenv("HAVENOPS_USE_MEMORY") == "1" {
 		st = store.NewMemory()
 	} else {
+		sqliteMode = true
 		path := os.Getenv("HAVENOPS_SQLITE_PATH")
 		if path == "" {
 			path = "havenops.db"
@@ -40,7 +42,15 @@ func main() {
 		log.Printf("using SQLite store at %s", path)
 	}
 
-	if err := bootstrap.SeedAdmin(st, os.Getenv("HAVENOPS_ADMIN_EMAIL"), os.Getenv("HAVENOPS_ADMIN_PASSWORD")); err != nil {
+	adminEmail := os.Getenv("HAVENOPS_ADMIN_EMAIL")
+	adminPass := os.Getenv("HAVENOPS_ADMIN_PASSWORD")
+	if sqliteMode && adminEmail == "" && adminPass == "" {
+		adminEmail = bootstrap.DefaultSQLiteAdminEmail
+		adminPass = bootstrap.DefaultSQLiteAdminPassword
+		log.Printf("SQLite: seeding default admin %q (set HAVENOPS_ADMIN_EMAIL and HAVENOPS_ADMIN_PASSWORD to override)", adminEmail)
+	}
+
+	if err := bootstrap.SeedAdmin(st, adminEmail, adminPass); err != nil {
 		log.Fatalf("seed admin: %v", err)
 	}
 	if os.Getenv("HAVENOPS_SEED_DEMO") == "1" {
