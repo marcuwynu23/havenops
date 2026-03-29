@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "../../lib/cn";
 import { SheetDragHandle, sheetPanelClassName } from "../SheetChrome";
+import { BrandWordmark } from "./BrandWordmark";
 
 export type NavIcon =
   | "home"
@@ -27,7 +28,6 @@ export type NavItemConfig = {
 };
 
 export type AdminShellProps = {
-  brand: string;
   navItems: NavItemConfig[];
   sidebarFooter?: ReactNode;
   children: ReactNode;
@@ -148,7 +148,7 @@ function MobileAccountSheet({
 }: {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   children: ReactNode;
 }) {
   useEffect(() => {
@@ -191,10 +191,7 @@ function MobileAccountSheet({
       >
         <SheetDragHandle className="pt-2 pb-1" hideFrom="never" />
         <div className="border-b border-border px-4 pb-3 pt-1">
-          <h2
-            id="mobile-sheet-title"
-            className="font-display text-lg font-semibold text-foreground"
-          >
+          <h2 id="mobile-sheet-title" className="text-foreground">
             {title}
           </h2>
           <p className="text-xs text-muted">Account &amp; appearance</p>
@@ -245,7 +242,6 @@ function PersonGlyph({ className }: { className?: string }) {
 }
 
 export function AdminShell({
-  brand,
   navItems,
   sidebarFooter,
   children,
@@ -296,9 +292,7 @@ export function AdminShell({
         style={{ paddingTop: "max(0px, env(safe-area-inset-top, 0px))" }}
       >
         <div className="min-w-0 flex-1">
-          <p className="truncate font-display text-lg font-semibold tracking-tight text-foreground">
-            {brand}
-          </p>
+          <BrandWordmark className="truncate text-lg" />
         </div>
         {sidebarFooter ? (
           <button
@@ -322,9 +316,7 @@ export function AdminShell({
         )}
       >
         <div className="mb-3 px-2 pt-1">
-          <p className="font-display text-xl font-semibold tracking-tight text-foreground">
-            {brand}
-          </p>
+          <BrandWordmark className="text-xl" />
         </div>
         <nav className="flex flex-1 flex-col gap-0.5" aria-label="Main">
           {navItems.map((item) => (
@@ -436,7 +428,7 @@ export function AdminShell({
         <MobileAccountSheet
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
-          title={brand}
+          title={<BrandWordmark className="text-lg" />}
         >
           {sidebarFooter}
         </MobileAccountSheet>

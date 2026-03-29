@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
+import { BrandWordmark } from "../../components/layout/BrandWordmark";
 import { ThemePreferenceControl } from "../../components/ThemePreferenceControl";
 import { HydrateCenterSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import { buttonClassName, Card, CardTitle, Muted } from "../../components/ui";
@@ -65,9 +66,7 @@ export default function LandingPage() {
 
       <header className="relative z-10 border-b border-border/60 bg-surface/40 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <p className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
-            HavenOps
-          </p>
+          <BrandWordmark className="text-xl sm:text-2xl" />
           <p className="hidden text-xs font-medium uppercase tracking-[0.2em] text-muted sm:block">
             House cleaning
           </p>
@@ -84,7 +83,8 @@ export default function LandingPage() {
               A cleaner home—delivered with care.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              <span className="font-medium text-foreground">HavenOps</span> is a
+              <BrandWordmark className="relative -top-px mr-0.5 inline-flex align-middle text-[1.05em] sm:text-[1.02em]" />{" "}
+              is a
               house cleaning service provider for busy households. We handle
               recurring and one-time visits so you can walk back into a space
               that feels calm, fresh, and truly clean—not another chore on your
@@ -205,8 +205,9 @@ export default function LandingPage() {
         <section className="border-t border-border/60 bg-surface/30 py-16 sm:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                Why homeowners choose HavenOps
+              <h2 className="flex flex-wrap items-baseline justify-center gap-x-1.5 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                <span className="text-center">Why homeowners choose</span>
+                <BrandWordmark className="shrink-0 text-2xl sm:text-3xl" />
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
                 Real service, real people—focused on respect for your home and
@@ -258,9 +259,7 @@ export default function LandingPage() {
 
       <footer className="relative z-10 border-t border-border bg-surface/40 py-10 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 text-center sm:px-6 lg:px-8">
-          <p className="font-display text-lg font-semibold text-foreground">
-            HavenOps
-          </p>
+          <BrandWordmark className="text-lg sm:text-xl" />
           <p className="max-w-md text-xs leading-relaxed text-muted sm:text-sm">
             Professional house cleaning for homes that deserve more than a quick
             once-over. Questions about pricing or coverage? Book online or sign
