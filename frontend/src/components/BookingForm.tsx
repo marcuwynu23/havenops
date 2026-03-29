@@ -1,5 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { createJob } from "../api";
+import { queryKeys } from "../lib/queryKeys";
 import {
   Alert,
   Button,
@@ -14,6 +16,7 @@ type Props = {
 };
 
 export default function BookingForm({ onCreated }: Props) {
+  const queryClient = useQueryClient();
   const [serviceType, setServiceType] = useState("Standard clean");
   const [scheduledLocal, setScheduledLocal] = useState(() => {
     const d = new Date();
@@ -22,27 +25,29 @@ export default function BookingForm({ onCreated }: Props) {
   });
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const d = new Date(scheduledLocal);
-      await createJob({
-        client_id: "",
-        service_type: serviceType,
-        scheduled_at: d.toISOString(),
-        notes: notes || undefined,
-      });
+  const mutation = useMutation({
+    mutationFn: createJob,
+    onMutate: () => setError(null),
+    onSuccess: async () => {
       setNotes("");
+      await queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
       onCreated?.();
-    } catch (err) {
+    },
+    onError: (err) => {
       setError(err instanceof Error ? err.message : "Could not create job");
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    const d = new Date(scheduledLocal);
+    mutation.mutate({
+      client_id: "",
+      service_type: serviceType,
+      scheduled_at: d.toISOString(),
+      notes: notes || undefined,
+    });
   }
 
   return (
@@ -73,8 +78,8 @@ export default function BookingForm({ onCreated }: Props) {
           onChange={(e) => setNotes(e.target.value)}
         />
       </Field>
-      <Button type="submit" variant="highlight" disabled={loading}>
-        {loading ? "Creating…" : "Request booking"}
+      <Button type="submit" variant="highlight" disabled={mutation.isPending}>
+        {mutation.isPending ? "Creating…" : "Request booking"}
       </Button>
     </FormGrid>
   );

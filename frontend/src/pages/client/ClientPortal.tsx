@@ -1,29 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Client, Job } from "../../api";
-import { getClients, getJobs } from "../../api";
+import { useMemo } from "react";
 import BookingForm from "../../components/BookingForm";
 import JobTable from "../../components/JobTable";
-import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
+import { Alert, Card, CardTitle, Muted, PageHeader } from "../../components/ui";
+import {
+  useClientsQuery,
+  useJobsQuery,
+} from "../../hooks/useHavenOpsQueries";
+import { queryErrorMessage } from "../../lib/queryError";
 
 export default function ClientPortal() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const jobsQ = useJobsQuery();
+  const clientsQ = useClientsQuery();
 
-  const load = useCallback(async () => {
-    setError(null);
-    try {
-      const [j, c] = await Promise.all([getJobs(), getClients()]);
-      setJobs(j);
-      setClients(c);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load");
-    }
-  }, []);
+  const jobs = jobsQ.data ?? [];
+  const clients = clientsQ.data ?? [];
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const error = queryErrorMessage(jobsQ.error, clientsQ.error);
+  const loading = jobsQ.isPending || clientsQ.isPending;
 
   const clientMap = useMemo(
     () => new Map(clients.map((c) => [c.id, c])),
@@ -37,9 +30,10 @@ export default function ClientPortal() {
         description="Request service and track your jobs."
       />
       {error ? <Alert className="mb-4">{error}</Alert> : null}
+      {loading ? <Muted className="mb-4">Loading…</Muted> : null}
       <Card>
         <CardTitle>New booking</CardTitle>
-        <BookingForm onCreated={load} />
+        <BookingForm />
       </Card>
       <Card>
         <CardTitle>Your jobs</CardTitle>

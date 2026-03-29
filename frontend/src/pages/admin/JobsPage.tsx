@@ -1,19 +1,30 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import JobTable from "../../components/JobTable";
-import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
-import { useHavenOpsStore } from "../../store/havenopsStore";
+import { Alert, Card, CardTitle, Muted, PageHeader } from "../../components/ui";
+import {
+  useClientsQuery,
+  useEmployeesQuery,
+  useJobsQuery,
+} from "../../hooks/useHavenOpsQueries";
+import { queryErrorMessage } from "../../lib/queryError";
 
 export default function JobsPage() {
-  const jobs = useHavenOpsStore((s) => s.jobs);
-  const clients = useHavenOpsStore((s) => s.clients);
-  const employees = useHavenOpsStore((s) => s.employees);
-  const listError = useHavenOpsStore((s) => s.listError);
-  const fetchLists = useHavenOpsStore((s) => s.fetchLists);
-  const refreshAll = useHavenOpsStore((s) => s.refreshAll);
+  const clientsQ = useClientsQuery();
+  const employeesQ = useEmployeesQuery();
+  const jobsQ = useJobsQuery();
 
-  useEffect(() => {
-    void fetchLists();
-  }, [fetchLists]);
+  const clients = clientsQ.data ?? [];
+  const employees = employeesQ.data ?? [];
+  const jobs = jobsQ.data ?? [];
+
+  const listError = queryErrorMessage(
+    clientsQ.error,
+    employeesQ.error,
+    jobsQ.error,
+  );
+
+  const loading =
+    clientsQ.isPending || employeesQ.isPending || jobsQ.isPending;
 
   const clientMap = useMemo(
     () => new Map(clients.map((c) => [c.id, c])),
@@ -24,6 +35,7 @@ export default function JobsPage() {
     <>
       <PageHeader title="Jobs" />
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
+      {loading ? <Muted className="mb-4">Loading jobs…</Muted> : null}
       <p className="mb-4 text-xs leading-relaxed text-muted sm:text-sm sm:leading-normal">
         Bookings are created by clients from their portal. Jobs without an
         assignee stay pending until someone is free in that time window; assign
@@ -36,7 +48,6 @@ export default function JobsPage() {
           clients={clientMap}
           employees={employees}
           mode="admin"
-          onChanged={refreshAll}
         />
       </Card>
     </>

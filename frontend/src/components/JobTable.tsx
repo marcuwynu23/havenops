@@ -1,6 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Client, Employee, Job, JobStatus } from "../api";
 import { patchJobAssign, patchJobStatus } from "../api";
+import { queryKeys } from "../lib/queryKeys";
 import {
   Alert,
   Button,
@@ -37,6 +39,7 @@ type Props = {
   clients: Map<string, Client>;
   employees: Employee[];
   mode: "admin" | "employee" | "client";
+  /** Optional extra callback after a successful job mutation (cache is also invalidated). */
   onChanged?: () => void;
 };
 
@@ -52,27 +55,49 @@ export default function JobTable({
   mode,
   onChanged,
 }: Props) {
+  const queryClient = useQueryClient();
   const [actionError, setActionError] = useState<string | null>(null);
   const activeEmps = employees.filter((e) => e.is_active);
 
-  async function setStatus(id: string, status: JobStatus) {
-    setActionError(null);
-    try {
-      await patchJobStatus(id, status);
-      onChanged?.();
-    } catch (e) {
-      setActionError(e instanceof Error ? e.message : "Update failed");
-    }
+  const afterJobWrite = () => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
+    onChanged?.();
+  };
+
+  const statusMutation = useMutation({
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: JobStatus;
+    }) => patchJobStatus(id, status),
+    onMutate: () => setActionError(null),
+    onSuccess: afterJobWrite,
+    onError: (e) =>
+      setActionError(e instanceof Error ? e.message : "Update failed"),
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: ({
+      id,
+      employeeId,
+    }: {
+      id: string;
+      employeeId: string | null;
+    }) => patchJobAssign(id, employeeId),
+    onMutate: () => setActionError(null),
+    onSuccess: afterJobWrite,
+    onError: (e) =>
+      setActionError(e instanceof Error ? e.message : "Assign failed"),
+  });
+
+  function setStatus(id: string, status: JobStatus) {
+    statusMutation.mutate({ id, status });
   }
 
-  async function assign(id: string, employeeId: string) {
-    setActionError(null);
-    try {
-      await patchJobAssign(id, employeeId || null);
-      onChanged?.();
-    } catch (e) {
-      setActionError(e instanceof Error ? e.message : "Assign failed");
-    }
+  function assign(id: string, employeeId: string) {
+    assignMutation.mutate({ id, employeeId: employeeId || null });
   }
 
   if (jobs.length === 0) {
@@ -80,6 +105,7 @@ export default function JobTable({
   }
 
   const showActions = mode !== "client";
+  const mutating = statusMutation.isPending || assignMutation.isPending;
 
   return (
     <>
@@ -134,7 +160,9 @@ export default function JobTable({
                             value={j.assigned_employee_id ?? ""}
                             onChange={(e) => assign(j.id, e.target.value)}
                             disabled={
-                              j.status === "done" || j.status === "cancelled"
+                              mutating ||
+                              j.status === "done" ||
+                              j.status === "cancelled"
                             }
                             options={[
                               { value: "", label: "Unassigned" },
@@ -151,6 +179,7 @@ export default function JobTable({
                                   type="button"
                                   variant="ghost"
                                   size="sm"
+                                  disabled={mutating}
                                   onClick={() =>
                                     setStatus(j.id, "in_progress")
                                   }
@@ -162,6 +191,7 @@ export default function JobTable({
                                 <Button
                                   type="button"
                                   size="sm"
+                                  disabled={mutating}
                                   onClick={() => setStatus(j.id, "done")}
                                 >
                                   Done
@@ -171,6 +201,7 @@ export default function JobTable({
                                 type="button"
                                 variant="danger"
                                 size="sm"
+                                disabled={mutating}
                                 onClick={() => setStatus(j.id, "cancelled")}
                               >
                                 Cancel
@@ -184,6 +215,7 @@ export default function JobTable({
                             <Button
                               type="button"
                               size="sm"
+                              disabled={mutating}
                               onClick={() => next && setStatus(j.id, next)}
                             >
                               {next === "done" ? "Mark done" : "Start job"}
@@ -240,7 +272,9 @@ export default function JobTable({
                         value={j.assigned_employee_id ?? ""}
                         onChange={(e) => assign(j.id, e.target.value)}
                         disabled={
-                          j.status === "done" || j.status === "cancelled"
+                          mutating ||
+                          j.status === "done" ||
+                          j.status === "cancelled"
                         }
                         options={[
                           { value: "", label: "Unassigned" },
@@ -258,6 +292,7 @@ export default function JobTable({
                               variant="ghost"
                               size="sm"
                               className="flex-1 min-[400px]:flex-none"
+                              disabled={mutating}
                               onClick={() => setStatus(j.id, "in_progress")}
                             >
                               In progress
@@ -268,6 +303,7 @@ export default function JobTable({
                               type="button"
                               size="sm"
                               className="flex-1 min-[400px]:flex-none"
+                              disabled={mutating}
                               onClick={() => setStatus(j.id, "done")}
                             >
                               Done
@@ -278,6 +314,7 @@ export default function JobTable({
                             variant="danger"
                             size="sm"
                             className="flex-1 min-[400px]:flex-none"
+                            disabled={mutating}
                             onClick={() => setStatus(j.id, "cancelled")}
                           >
                             Cancel
@@ -291,6 +328,7 @@ export default function JobTable({
                         <Button
                           type="button"
                           size="sm"
+                          disabled={mutating}
                           onClick={() => next && setStatus(j.id, next)}
                         >
                           {next === "done" ? "Mark done" : "Start job"}

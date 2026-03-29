@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Alert,
   Card,
@@ -17,21 +16,21 @@ import {
   Td,
   Th,
 } from "../../components/ui";
-import { useHavenOpsStore } from "../../store/havenopsStore";
+import { useClientsQuery } from "../../hooks/useHavenOpsQueries";
+import { queryErrorMessage } from "../../lib/queryError";
 
 export default function ClientsPage() {
-  const clients = useHavenOpsStore((s) => s.clients);
-  const listError = useHavenOpsStore((s) => s.listError);
-  const fetchLists = useHavenOpsStore((s) => s.fetchLists);
-
-  useEffect(() => {
-    void fetchLists();
-  }, [fetchLists]);
+  const clientsQ = useClientsQuery();
+  const clients = clientsQ.data ?? [];
+  const listError = queryErrorMessage(clientsQ.error);
 
   return (
     <>
       <PageHeader title="Clients" />
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
+      {clientsQ.isPending ? (
+        <Muted className="mb-4">Loading clients…</Muted>
+      ) : null}
       <Card>
         <CardTitle>Directory</CardTitle>
         <p className="mb-4 text-xs leading-relaxed text-muted sm:text-sm">

@@ -1,4 +1,5 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type FormEvent, useState } from "react";
 import type { Employee } from "../../api";
 import { createEmployee, setEmployeeActive } from "../../api";
 import { Modal } from "../../components/Modal";
@@ -25,25 +26,55 @@ import {
   Td,
   Th,
 } from "../../components/ui";
-import { useHavenOpsStore } from "../../store/havenopsStore";
+import { useEmployeesQuery } from "../../hooks/useHavenOpsQueries";
+import { queryErrorMessage } from "../../lib/queryError";
+import { queryKeys } from "../../lib/queryKeys";
 
 export default function EmployeesPage() {
-  const employees = useHavenOpsStore((s) => s.employees);
-  const listError = useHavenOpsStore((s) => s.listError);
-  const fetchLists = useHavenOpsStore((s) => s.fetchLists);
+  const queryClient = useQueryClient();
+  const employeesQ = useEmployeesQuery();
+  const employees = employeesQ.data ?? [];
+  const listError = queryErrorMessage(employeesQ.error);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [toggleError, setToggleError] = useState<string | null>(null);
 
-  useEffect(() => {
-    void fetchLists();
-  }, [fetchLists]);
+  const createMutation = useMutation({
+    mutationFn: createEmployee,
+    onMutate: () => setCreateError(null),
+    onSuccess: async () => {
+      resetCreateForm();
+      setModalOpen(false);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.employees });
+    },
+    onError: (err) => {
+      setCreateError(
+        err instanceof Error ? err.message : "Could not create",
+      );
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: ({
+      id,
+      is_active,
+    }: {
+      id: string;
+      is_active: boolean;
+    }) => setEmployeeActive(id, is_active),
+    onMutate: () => setToggleError(null),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.employees });
+    },
+    onError: (err) => {
+      setToggleError(err instanceof Error ? err.message : "Update failed");
+    },
+  });
 
   function resetCreateForm() {
     setName("");
@@ -58,36 +89,19 @@ export default function EmployeesPage() {
     resetCreateForm();
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setCreateError(null);
-    try {
-      await createEmployee({
-        name,
-        phone,
-        email,
-        password,
-        is_active: true,
-      });
-      resetCreateForm();
-      setModalOpen(false);
-      await fetchLists();
-    } catch (err) {
-      setCreateError(err instanceof Error ? err.message : "Could not create");
-    } finally {
-      setLoading(false);
-    }
+    createMutation.mutate({
+      name,
+      phone,
+      email,
+      password,
+      is_active: true,
+    });
   }
 
-  async function toggle(emp: Employee) {
-    setToggleError(null);
-    try {
-      await setEmployeeActive(emp.id, !emp.is_active);
-      await fetchLists();
-    } catch (err) {
-      setToggleError(err instanceof Error ? err.message : "Update failed");
-    }
+  function toggle(emp: Employee) {
+    toggleMutation.mutate({ id: emp.id, is_active: !emp.is_active });
   }
 
   return (
@@ -109,6 +123,9 @@ export default function EmployeesPage() {
         </Button>
       </div>
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
+      {employeesQ.isPending ? (
+        <Muted className="mb-4">Loading team…</Muted>
+      ) : null}
       {toggleError ? <Alert className="mb-4">{toggleError}</Alert> : null}
       <Card>
         <CardTitle>Team</CardTitle>
@@ -142,6 +159,7 @@ export default function EmployeesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => toggle(e)}
+                          disabled={toggleMutation.isPending}
                         >
                           {e.is_active ? "Deactivate" : "Activate"}
                         </Button>
@@ -170,6 +188,7 @@ export default function EmployeesPage() {
                       size="sm"
                       className="w-full sm:w-auto"
                       onClick={() => toggle(e)}
+                      disabled={toggleMutation.isPending}
                     >
                       {e.is_active ? "Deactivate" : "Activate"}
                     </Button>
@@ -233,8 +252,8 @@ export default function EmployeesPage() {
             <Button type="button" variant="ghost" onClick={closeModal}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving…" : "Create employee"}
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending ? "Saving…" : "Create employee"}
             </Button>
           </div>
         </FormGrid>
