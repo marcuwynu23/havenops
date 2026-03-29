@@ -45,14 +45,18 @@ export default function JobsPage() {
             assignee stay pending until someone is free in that time window;
             assign manually if needed.
           </p>
-          <Card>
+          <Card className="overflow-hidden">
             <CardTitle>All jobs</CardTitle>
-            <JobTable
-              jobs={jobs}
-              clients={clientMap}
-              employees={employees}
-              mode="admin"
-            />
+            <div className="-mx-4 w-[calc(100%+2rem)] overflow-x-auto sm:-mx-5 sm:w-[calc(100%+2.5rem)]">
+              <div className="min-w-0 px-4 sm:px-5">
+                <JobTable
+                  jobs={jobs}
+                  clients={clientMap}
+                  employees={employees}
+                  mode="admin"
+                />
+              </div>
+            </div>
           </Card>
         </>
       )}

@@ -119,17 +119,23 @@ export default function JobTable({
         <Alert className="mb-3">{actionError}</Alert>
       ) : null}
       <TableDesktop>
-        <Table>
+        <Table className="w-full min-w-[56rem] table-fixed">
           <TableHead>
             <TableRow>
-              <Th>When</Th>
-              <Th>Client</Th>
-              {showSite ? <Th>Site</Th> : null}
-              <Th>Service</Th>
-              {mode !== "client" ? <Th>Assignee</Th> : null}
-              <Th>Status</Th>
+              <Th className="w-[11rem]">When</Th>
+              <Th className="w-[9rem]">Client</Th>
+              {showSite ? (
+                <Th className="w-[11rem] sm:w-[12rem]">Site</Th>
+              ) : null}
+              <Th className="min-w-0">Service</Th>
+              {mode !== "client" ? (
+                <Th className="w-[8.5rem]">Assignee</Th>
+              ) : null}
+              <Th className="w-[7.5rem]">Status</Th>
               {showActions ? (
-                <Th>{mode === "admin" ? "Actions" : "Update"}</Th>
+                <Th className="w-[14rem] sm:w-[15rem]">
+                  {mode === "admin" ? "Actions" : "Update"}
+                </Th>
               ) : null}
             </TableRow>
           </TableHead>
@@ -148,25 +154,31 @@ export default function JobTable({
 
               return (
                 <TableRow key={j.id}>
-                  <Td>{formatWhen(j.scheduled_at)}</Td>
-                  <Td>{client?.name ?? j.client_id}</Td>
+                  <Td className="align-top whitespace-normal break-words">
+                    {formatWhen(j.scheduled_at)}
+                  </Td>
+                  <Td className="align-top break-words">
+                    {client?.name ?? j.client_id}
+                  </Td>
                   {showSite ? (
-                    <Td className="max-w-[1px] align-top">
+                    <Td className="align-top">
                       <JobSiteBlock
                         client={client}
-                        mapClassName="!aspect-auto h-28 max-h-28 w-full min-w-[10rem]"
+                        mapClassName="!max-w-full !aspect-auto h-28 max-h-28 w-full"
                       />
                     </Td>
                   ) : null}
-                  <Td>{j.service_type}</Td>
+                  <Td className="align-top break-words">{j.service_type}</Td>
                   {mode !== "client" ? (
-                    <Td>{assignee?.name ?? "—"}</Td>
+                    <Td className="align-top break-words">
+                      {assignee?.name ?? "—"}
+                    </Td>
                   ) : null}
-                  <Td>
+                  <Td className="align-top">
                     <JobStatusBadge status={j.status} />
                   </Td>
                   {showActions ? (
-                    <Td>
+                    <Td className="align-top">
                       {mode === "admin" ? (
                         <RowActions>
                           <Select

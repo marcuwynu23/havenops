@@ -31,7 +31,7 @@ export function JobSiteBlock({ client, mapClassName }: Props) {
   const coordsOk = hasCoords(client);
 
   return (
-    <div className="max-w-[14rem] space-y-2 text-left sm:max-w-[16rem]">
+    <div className="max-w-full space-y-2 text-left">
       {addr ? (
         <p className="text-xs leading-snug text-foreground">{addr}</p>
       ) : (
