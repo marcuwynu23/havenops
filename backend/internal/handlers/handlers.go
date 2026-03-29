@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"math"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -35,6 +37,7 @@ func (a *API) Routes() chi.Router {
 		pr.Get("/auth/me", a.getMe)
 		pr.Post("/clients", a.postClient)
 		pr.Get("/clients", a.getClients)
+		pr.Patch("/clients/me", a.patchClientMe)
 		pr.Post("/employees", a.postEmployee)
 		pr.Get("/employees", a.getEmployees)
 		pr.Patch("/employees/{id}", a.patchEmployee)
@@ -112,6 +115,79 @@ func (a *API) getClients(w http.ResponseWriter, r *http.Request) {
 		list = []models.Client{}
 	}
 	writeJSON(w, http.StatusOK, list)
+}
+
+type patchClientMeBody struct {
+	Address          *string  `json:"address"`
+	Latitude         *float64 `json:"latitude"`
+	Longitude        *float64 `json:"longitude"`
+	ClearCoordinates *bool    `json:"clear_coordinates"`
+}
+
+func validWGS84(lat, lon float64) bool {
+	if math.IsNaN(lat) || math.IsNaN(lon) || math.IsInf(lat, 0) || math.IsInf(lon, 0) {
+		return false
+	}
+	return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180
+}
+
+func (a *API) patchClientMe(w http.ResponseWriter, r *http.Request) {
+	u := userFromCtx(r.Context())
+	if u == nil {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
+		return
+	}
+	if u.Role != models.RoleClient || u.ClientID == nil {
+		writeJSON(w, http.StatusForbidden, map[string]string{"error": "clients only"})
+		return
+	}
+	var body patchClientMeBody
+	if err := readJSON(r, &body); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid json"})
+		return
+	}
+	changed := false
+	c, err := a.Store.GetClient(*u.ClientID)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+	if body.Address != nil {
+		c.Address = strings.TrimSpace(*body.Address)
+		changed = true
+	}
+	if body.ClearCoordinates != nil && *body.ClearCoordinates {
+		c.Latitude, c.Longitude = nil, nil
+		changed = true
+	} else if body.Latitude != nil || body.Longitude != nil {
+		if body.Latitude == nil || body.Longitude == nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{
+				"error": "latitude and longitude must both be sent together",
+			})
+			return
+		}
+		if !validWGS84(*body.Latitude, *body.Longitude) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid coordinates"})
+			return
+		}
+		lat, lon := *body.Latitude, *body.Longitude
+		c.Latitude = &lat
+		c.Longitude = &lon
+		changed = true
+	}
+	if !changed {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "no updates"})
+		return
+	}
+	if err := a.Store.UpdateClient(c); err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
+			return
+		}
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, c)
 }
 
 type postEmployeeBody struct {

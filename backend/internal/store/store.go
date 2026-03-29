@@ -6,6 +6,7 @@ type Store interface {
 	CreateClient(c *models.Client) error
 	ListClients() ([]models.Client, error)
 	GetClient(id string) (*models.Client, error)
+	UpdateClient(c *models.Client) error
 	ListClientsForEmployeeJobs(employeeID string) ([]models.Client, error)
 
 	CreateEmployee(e *models.Employee) error

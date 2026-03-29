@@ -150,6 +150,17 @@ func (m *Memory) GetClient(id string) (*models.Client, error) {
 	return &copy, nil
 }
 
+func (m *Memory) UpdateClient(c *models.Client) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if _, ok := m.clients[c.ID]; !ok {
+		return ErrNotFound
+	}
+	cp := *c
+	m.clients[c.ID] = &cp
+	return nil
+}
+
 func (m *Memory) ListClientsForEmployeeJobs(employeeID string) ([]models.Client, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()

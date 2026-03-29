@@ -3,11 +3,13 @@ package models
 import "time"
 
 type Client struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	Phone     string     `json:"phone"`
+	Address   string     `json:"address"`
+	Latitude  *float64   `json:"latitude,omitempty"`
+	Longitude *float64   `json:"longitude,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type Employee struct {
