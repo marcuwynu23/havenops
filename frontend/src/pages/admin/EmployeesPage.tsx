@@ -3,7 +3,7 @@ import { type FormEvent, useState } from "react";
 import type { Employee } from "../../api";
 import { createEmployee, setEmployeeActive } from "../../api";
 import { Modal } from "../../components/Modal";
-import { EmployeesTableSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { EmployeesPageSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import {
   Alert,
   Badge,
@@ -126,7 +126,7 @@ export default function EmployeesPage() {
       {listError ? <Alert className="mb-4">{listError}</Alert> : null}
       {toggleError ? <Alert className="mb-4">{toggleError}</Alert> : null}
       {employeesQ.isPending ? (
-        <EmployeesTableSkeleton />
+        <EmployeesPageSkeleton />
       ) : (
         <Card>
           <CardTitle>Team</CardTitle>

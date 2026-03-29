@@ -13,9 +13,11 @@ import {
 
 type Props = {
   onCreated?: () => void;
+  /** When set, shows a Cancel control (e.g. in a modal) alongside submit. */
+  onCancel?: () => void;
 };
 
-export default function BookingForm({ onCreated }: Props) {
+export default function BookingForm({ onCreated, onCancel }: Props) {
   const queryClient = useQueryClient();
   const [serviceType, setServiceType] = useState("Standard clean");
   const [scheduledLocal, setScheduledLocal] = useState(() => {
@@ -78,9 +80,20 @@ export default function BookingForm({ onCreated }: Props) {
           onChange={(e) => setNotes(e.target.value)}
         />
       </Field>
-      <Button type="submit" variant="highlight" disabled={mutation.isPending}>
-        {mutation.isPending ? "Creating…" : "Request booking"}
-      </Button>
+      {onCancel ? (
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="highlight" disabled={mutation.isPending}>
+            {mutation.isPending ? "Creating…" : "Request booking"}
+          </Button>
+        </div>
+      ) : (
+        <Button type="submit" variant="highlight" disabled={mutation.isPending}>
+          {mutation.isPending ? "Creating…" : "Request booking"}
+        </Button>
+      )}
     </FormGrid>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { BrandWordmark } from "../../components/layout/BrandWordmark";
 import { ThemePreferenceControl } from "../../components/ThemePreferenceControl";
-import { HydrateCenterSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { LandingHydrateSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import { buttonClassName, Card, CardTitle, Muted } from "../../components/ui";
 import { cn } from "../../lib/cn";
 import { roleHome, useAuthStore } from "../../store/authStore";
@@ -39,7 +39,7 @@ export default function LandingPage() {
 
   if (!hydrated) {
     return (
-      <HydrateCenterSkeleton className="min-h-[100dvh] font-sans text-foreground" />
+      <LandingHydrateSkeleton className="min-h-[100dvh] font-sans text-foreground" />
     );
   }
 

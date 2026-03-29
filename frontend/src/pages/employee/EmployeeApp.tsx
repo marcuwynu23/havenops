@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import JobTable from "../../components/JobTable";
-import { JobTableCardSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { EmployeeAppContentSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
 import {
   useClientsQuery,
@@ -33,7 +33,7 @@ export default function EmployeeApp() {
       />
       {error ? <Alert className="mb-4">{error}</Alert> : null}
       {loading ? (
-        <JobTableCardSkeleton titleWidth="w-40" />
+        <EmployeeAppContentSkeleton />
       ) : (
         <Card>
           <CardTitle>Assigned work</CardTitle>

@@ -16,7 +16,7 @@ import {
   PageHeader,
   Textarea,
 } from "../../components/ui";
-import { TableRowsSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { ClientLocationPageSkeleton } from "../../components/skeletons/PageContentSkeletons";
 import { useClientsQuery } from "../../hooks/useHavenOpsQueries";
 import { queryKeys } from "../../lib/queryKeys";
 
@@ -122,15 +122,7 @@ export default function ClientLocationPage() {
   }
 
   if (clientsQ.isPending) {
-    return (
-      <>
-        <PageHeader
-          title="Home location"
-          description="Keep your service address and map pin up to date so your crew can find you."
-        />
-        <TableRowsSkeleton rows={4} />
-      </>
-    );
+    return <ClientLocationPageSkeleton />;
   }
 
   if (!me) {

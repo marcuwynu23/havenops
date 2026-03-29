@@ -8,8 +8,8 @@ import {
 } from "react-router-dom";
 import { AdminShell, type NavItemConfig } from "./components/layout/AdminShell";
 import {
-  HydrateCenterSkeleton,
-  RouteFallbackSkeleton,
+  RouteFallbackByPath,
+  SessionLoadingSkeleton,
 } from "./components/skeletons/PageContentSkeletons";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { Button } from "./components/ui";
@@ -38,8 +38,6 @@ const ClientPortal = lazy(() => import("./pages/client/ClientPortal"));
 const ClientLocationPage = lazy(
   () => import("./pages/client/ClientLocationPage"),
 );
-
-const routeFallback = <RouteFallbackSkeleton />;
 
 const ADMIN_NAV: NavItemConfig[] = [
   {
@@ -170,7 +168,7 @@ function CatchAllRedirect() {
   }, [hydrate]);
 
   if (!hydrated) {
-    return <HydrateCenterSkeleton />;
+    return <SessionLoadingSkeleton />;
   }
   if (!token || !user) {
     return <Navigate to="/" replace />;
@@ -180,7 +178,7 @@ function CatchAllRedirect() {
 
 export default function App() {
   return (
-    <Suspense fallback={routeFallback}>
+    <Suspense fallback={<RouteFallbackByPath />}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />

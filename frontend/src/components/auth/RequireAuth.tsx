@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { HydrateCenterSkeleton } from "../skeletons/PageContentSkeletons";
+import { SessionLoadingSkeleton } from "../skeletons/PageContentSkeletons";
 import { loginPathForProtectedRoute } from "../../lib/authRoutes";
 import { useAuthStore } from "../../store/authStore";
 
@@ -15,7 +15,7 @@ export function RequireAuth() {
   }, [hydrate]);
 
   if (!hydrated) {
-    return <HydrateCenterSkeleton className="min-h-screen font-sans" />;
+    return <SessionLoadingSkeleton />;
   }
   if (!token) {
     const to = loginPathForProtectedRoute(location.pathname);

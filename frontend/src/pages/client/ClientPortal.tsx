@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import BookingForm from "../../components/BookingForm";
 import JobTable from "../../components/JobTable";
-import { TableRowsSkeleton } from "../../components/skeletons/PageContentSkeletons";
-import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
+import { Modal } from "../../components/Modal";
+import { ClientPortalJobsSkeleton } from "../../components/skeletons/PageContentSkeletons";
+import { Alert, Button, Card, CardTitle, PageHeader } from "../../components/ui";
 import {
   useClientsQuery,
   useJobsQuery,
@@ -12,6 +13,7 @@ import { queryErrorMessage } from "../../lib/queryError";
 export default function ClientPortal() {
   const jobsQ = useJobsQuery();
   const clientsQ = useClientsQuery();
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   const jobs = jobsQ.data ?? [];
   const clients = clientsQ.data ?? [];
@@ -30,16 +32,22 @@ export default function ClientPortal() {
         title="My bookings"
         description="Request service and track your jobs."
       />
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          variant="highlight"
+          className="min-h-11 touch-manipulation"
+          onClick={() => setBookingModalOpen(true)}
+        >
+          New booking
+        </Button>
+      </div>
       {error ? <Alert className="mb-4">{error}</Alert> : null}
-      <Card>
-        <CardTitle>New booking</CardTitle>
-        <BookingForm />
-      </Card>
       <Card>
         <CardTitle>Your jobs</CardTitle>
         {loading ? (
           <div aria-busy aria-label="Loading jobs">
-            <TableRowsSkeleton rows={7} />
+            <ClientPortalJobsSkeleton />
           </div>
         ) : (
           <JobTable
@@ -50,6 +58,19 @@ export default function ClientPortal() {
           />
         )}
       </Card>
+
+      <Modal
+        open={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+        title="New booking"
+        description="Choose a service type, time, and optional notes. We’ll confirm your visit on the schedule you pick."
+        size="md"
+      >
+        <BookingForm
+          onCreated={() => setBookingModalOpen(false)}
+          onCancel={() => setBookingModalOpen(false)}
+        />
+      </Modal>
     </>
   );
 }
