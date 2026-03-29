@@ -234,7 +234,7 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 
 ### Phase 1 – Backend MVP — **done**
 
-- Go server, Chi, models, REST under `/api`, in-memory `Store` interface + tests
+- Go server, Chi, models, REST under `/api`, `Store` interface + tests (in-memory reference impl for `go test`)
 
 ### Phase 2 – Frontend MVP — **done**
 
@@ -271,7 +271,7 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 
 - **SQLite** via `modernc.org/sqlite` (pure Go); **`Store`** implementation in `internal/store/sqlite.go` with **`CREATE TABLE IF NOT EXISTS`** migrations on open
 - **`recovery_tokens`** table so password recovery survives restarts
-- **`cmd/server`**: default `havenops.db` (override with `HAVENOPS_SQLITE_PATH`); `HAVENOPS_USE_MEMORY=1` keeps the in-memory store for tests/dev
+- **`cmd/server`**: **SQLite only** — default `havenops.db` (override with `HAVENOPS_SQLITE_PATH`)
 
 ### Phase 7 – Desktop & mobile
 
@@ -314,7 +314,7 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 
 ### Local
 
-- Backend: `make run` or `go run ./cmd/server` from `backend/`; SQLite file `havenops.db` (or `HAVENOPS_SQLITE_PATH`); optional `HAVENOPS_SEED_DEMO=1`; `HAVENOPS_USE_MEMORY=1` for in-memory only
+- Backend: `make run` or `go run ./cmd/server` from `backend/`; SQLite file `havenops.db` (or `HAVENOPS_SQLITE_PATH`); optional `HAVENOPS_SEED_DEMO=1`
 - Frontend: `npm run dev` from `frontend/`
 - Docker Compose (API + DB) — optional / future when DB lands
 
@@ -347,6 +347,6 @@ All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 ## Notes
 
 - Keep the system simple and fast; avoid overengineering for the single-tenant MVP
-- Default local API uses **SQLite** (`havenops.db`); use `HAVENOPS_USE_MEMORY=1` for ephemeral data
+- The API uses **SQLite** only (`havenops.db` by default)
 - Focus on real business usage; Capacitor/Electron follow after web + persistence are stable
 
