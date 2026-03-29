@@ -340,7 +340,7 @@ export function AdminShell({
           showMobileBottomBar
             ? "pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] lg:pb-10"
             : "pb-6 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] lg:pb-10",
-          "max-w-[1200px] px-4 py-4 sm:px-5 sm:py-5 lg:px-7 lg:py-6",
+          "w-full max-w-none px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6",
           mainClassName,
         )}
       >
