@@ -13,7 +13,8 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - React 19 + TypeScript (Vite 8)
 - React Router 7
 - Tailwind CSS v4 with `@tailwindcss/vite`
-- Zustand: **`authStore`**, **`havenopsStore`**, **`themeStore`** (appearance preference + `localStorage`)
+- Zustand: **`authStore`**, **`themeStore`** (appearance preference + `localStorage`)
+- **TanStack Query** (`@tanstack/react-query`): **`QueryProvider`** in `main.tsx`; shared keys in **`lib/queryKeys.ts`**; **`useClientsQuery` / `useEmployeesQuery` / `useJobsQuery`** (`hooks/useHavenOpsQueries.ts`); **`useMutation`** + **`invalidateQueries`** for job assign/status, employee create/toggle, client booking (**`JobTable`**, **`BookingForm`**, **`EmployeesPage`**)
 - Vitest + Testing Library + jsdom
 - Centralized UI kit under `frontend/src/components/ui` (Button variants including **`highlight`**, Card, Field, Input, Select, Textarea, Table, Badge, Alert, PageHeader, StatCard, StatsGrid, FormGrid, RowActions, Muted, responsive table helpers, etc.)
 - **Brand theme** in `frontend/src/styles/theme.css`: cleaning-service palette (**`#1e1e1e`**, **`#e5e5e5`**, **`#618b79`**, **`#f9d249`**) with **light** and **dark** modes via `html[data-theme]`; tokens include `highlight`, `nav-hover`, `backdrop`, job status colors
@@ -24,8 +25,6 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - **Public marketing `LandingPage`** at **`/`** (hero, feature cards, CTAs to register / staff login); signed-in users are redirected to `roleHome`
 - **`RequireAuth`**, role gates in `App.tsx` (`AdminGate`, `EmployeeGate`, `ClientGate`); admin app lives under **`/dashboard`**
 - **Route-level code splitting:** **`React.lazy`** + **`Suspense`** in `App.tsx` — each top-level page (`marketing/`, `auth/…`, `admin/`, `employee/`, `client/`) loads as its own **Vite async chunk**; global fallback UI while chunks load
-- **(Planned)** **TanStack Query** (`@tanstack/react-query`, formerly React Query) for **server state**: `useQuery` / `useMutation` for jobs, clients, employees, and related API calls; **cache**, **invalidation**, **loading/error** semantics, deduped requests; **`QueryClientProvider`** at app root. Migrate incrementally from **`havenopsStore`** list-fetch patterns; keep **Zustand** for **auth** and **theme** (and any purely client UI state)
-
 ### Frontend (planned)
 
 - Capacitor (Android)
@@ -222,13 +221,11 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 ### State
 
 - **`authStore`:** token, user, login/register/logout, `roleHome` (admin → `/dashboard`)
-- **`havenopsStore`:** lists refresh for admin workflows (**today**); **(planned)** superseded or thinned in favor of **TanStack Query** query keys + `invalidateQueries` after mutations
 - **`themeStore`:** `light` | `dark` | `system`, persisted
 
-### Data fetching (planned)
+### Data fetching
 
-- **TanStack Query** as the standard for anything that talks to **`/api`**: shared **`queryClient`** config (stale time, retry), **`useQuery`** for GET-style data, **`useMutation`** + **`onSuccess` invalidation** for PATCH/POST flows (e.g. job status, assign, booking)
-- **`api.ts`** functions remain thin fetch wrappers; hooks (or small `queries/` modules) compose them with React Query
+- **TanStack Query** for **`/api`** reads/writes: **`createAppQueryClient`** (`lib/createQueryClient.ts`), **`queryKeys`**, composable **`use*Query`** hooks; **`api.ts`** stays thin; **`createTestQueryClient`** for Vitest
 
 ---
 
@@ -263,11 +260,11 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 - **Mobile-native-style** shell (bottom nav, sheet, safe areas)
 - **Modal** add-employee; **PageHeader** brand accent
 
-### Phase 5b – TanStack Query (planned)
+### Phase 5b – TanStack Query — **done**
 
-- Add **`@tanstack/react-query`**, `QueryClientProvider`, Devtools (dev only, optional)
-- Port **admin** list views and **mutations** (job assign/status, employee create/toggle, booking) from **`havenopsStore`** to **`useQuery` / `useMutation`**; align **`EmployeeApp` / `ClientPortal`** direct **`api.ts`** calls with the same pattern where useful
-- Tests: wrap render helpers with a test **`QueryClientProvider`**
+- **`@tanstack/react-query`**, **`QueryProvider`** wrapping **`App`** in **`main.tsx`**
+- Admin pages + **`EmployeeApp`** / **`ClientPortal`** use **`useQuery`**; **`JobTable`**, **`BookingForm`**, **`EmployeesPage`** use **`useMutation`** + **`invalidateQueries`**; removed **`havenopsStore`**
+- Vitest: **`QueryClientProvider`** + **`createTestQueryClient`** in **`App.test.tsx`**
 
 ### Phase 6 – Persistence
 
@@ -297,7 +294,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Frontend
 
-- `npm run test` / `npm run test:run` — Vitest (API module, store, landing + login smoke routing); **(planned)** React Query test utilities when Phase 5b lands
+- `npm run test` / `npm run test:run` — Vitest (API module, landing + login smoke with **TanStack Query** test client)
 
 ---
 
