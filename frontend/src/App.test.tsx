@@ -34,7 +34,7 @@ describe("App", () => {
     await waitFor(() => {
       expect(
         screen.getByRole("heading", {
-          name: /Operations software built for residential cleaning teams/i,
+          name: /A cleaner home—delivered with care/i,
         }),
       ).toBeInTheDocument();
     });
