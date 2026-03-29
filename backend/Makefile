@@ -23,7 +23,6 @@ help: ## Show this help
 	@echo "Examples:"
 	@echo "  make run                    # dev server on :8080 (SQLite havenops.db in cwd)"
 	@echo "                              # default admin if env unset: admin@havenops.local / havenops123"
-	@echo "  HAVENOPS_USE_MEMORY=1 make run  # in-memory store (no DB file)"
 	@echo "  HAVENOPS_SEED_DEMO=1 make run   # dev server + demo clients/jobs/users (password: havenops123)"
 	@echo "  PORT=3000 make run          # dev server on :3000 (Unix / Git Bash)"
 	@echo "  make release                # cross-compile to $(DIST_DIR)/"
