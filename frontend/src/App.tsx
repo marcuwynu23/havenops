@@ -119,7 +119,6 @@ function AdminGate() {
   }
   return (
     <AdminShell
-      brand="HavenOps"
       navItems={ADMIN_NAV}
       sidebarFooter={<SidebarAccountFooter />}
     >
@@ -136,7 +135,6 @@ function EmployeeGate() {
   }
   return (
     <AdminShell
-      brand="HavenOps"
       navItems={EMPLOYEE_NAV}
       sidebarFooter={<SidebarAccountFooter />}
     >
@@ -153,7 +151,6 @@ function ClientGate() {
   }
   return (
     <AdminShell
-      brand="HavenOps"
       navItems={CLIENT_NAV}
       sidebarFooter={<SidebarAccountFooter />}
     >
