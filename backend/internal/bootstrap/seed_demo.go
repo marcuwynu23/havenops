@@ -19,7 +19,7 @@ const DemoAccountPassword = "havenops123"
 const demoSeedMarkerEmail = "alex@demo.havenops.local"
 
 // SeedDemo inserts sample clients, employees (with users), one client portal user, and jobs.
-// Safe to call on an empty in-memory store. If a user with the demo marker email already exists, returns nil immediately.
+// Safe to call on an empty store. If a user with the demo marker email already exists, returns nil immediately.
 // Use environment HAVENOPS_SEED_DEMO=1 from main; passwords are DemoAccountPassword (logged once).
 func SeedDemo(s store.Store) error {
 	if _, err := s.GetUserByEmail(demoSeedMarkerEmail); err == nil {
