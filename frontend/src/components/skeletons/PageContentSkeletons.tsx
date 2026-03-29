@@ -543,7 +543,7 @@ export function EmployeeAppContentSkeleton() {
 
 export function ClientPortalJobsSkeleton() {
   return (
-    <div className="mt-1 space-y-2" aria-busy aria-label="Loading jobs">
+    <div className="mt-1 space-y-2" aria-busy aria-label="Loading bookings">
       <div className="hidden overflow-x-auto md:block">
         <ClientJobTableSkeleton rows={6} />
       </div>
