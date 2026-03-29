@@ -27,4 +27,33 @@
   a {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Thin scrollbars aligned with HavenOps sage / surface tokens (light & dark) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ho-accent-muted) var(--ho-surface);
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--ho-surface);
+    border-radius: var(--radius-full, 9999px);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--ho-accent-muted);
+    border-radius: var(--radius-full, 9999px);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--ho-accent);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: var(--ho-background);
+  }
 }
