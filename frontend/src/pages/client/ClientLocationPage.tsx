@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 import {
   geocodeForward,
   geocodeReverse,
@@ -82,7 +82,7 @@ export default function ClientLocationPage() {
     },
   });
 
-  function onSave(e: React.FormEvent) {
+  function onSave(e: FormEvent) {
     e.preventDefault();
     setFormError(null);
     const trimmed = address.trim();
