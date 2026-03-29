@@ -14,8 +14,12 @@ export function BrandWordmark({ className }: Props) {
       )}
       aria-label="HavenOps"
     >
-      <span className="font-bold tracking-tight text-foreground">Haven</span>
-      <span className="font-bold tracking-tight text-accent">Ops</span>
+      <span className="font-bold tracking-tight text-foreground" aria-hidden>
+        Haven
+      </span>
+      <span className="font-bold tracking-tight text-accent" aria-hidden>
+        Ops
+      </span>
     </span>
   );
 }
