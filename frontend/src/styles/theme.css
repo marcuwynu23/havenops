@@ -1,0 +1,119 @@
+/*
+ * HavenOps — home cleaning service palette
+ * Core: #1e1e1e (ink), #e5e5e5 (mist), #618b79 (sage), #f9d249 (sunlight gold)
+ * Semantic tokens switch with html[data-theme].
+ */
+
+/* —— Dark: calm charcoal workspace, sage + gold accents —— */
+:root {
+  color-scheme: dark;
+  --ho-background: #1e1e1e;
+  --ho-surface: #262626;
+  --ho-border: #3a3a3a;
+  --ho-field: #2c2c2c;
+  --ho-foreground: #e5e5e5;
+  --ho-muted: #949494;
+  --ho-accent: #618b79;
+  --ho-accent-muted: #4d7266;
+  /* Text on filled sage / primary buttons */
+  --ho-accent-foreground: #f2f2f2;
+  --ho-highlight: #f9d249;
+  --ho-highlight-foreground: #1e1e1e;
+  --ho-warning: #f9d249;
+  --ho-danger: #c45c5c;
+  --ho-danger-foreground: #f5d4d4;
+
+  --ho-status-pending-bg: rgb(148 148 148 / 0.18);
+  --ho-status-assigned-bg: rgb(97 139 121 / 0.28);
+  --ho-status-assigned-fg: #b5d4c8;
+  --ho-status-progress-bg: rgb(249 210 73 / 0.22);
+  --ho-status-progress-fg: #fceea3;
+  --ho-status-done-bg: rgb(97 139 121 / 0.4);
+  --ho-status-done-fg: #dff5eb;
+  --ho-status-cancelled-bg: rgb(196 92 92 / 0.22);
+  --ho-status-cancelled-fg: #f0b0b0;
+
+  --ho-nav-active-bg: rgb(97 139 121 / 0.28);
+  --ho-nav-hover-bg: rgb(255 255 255 / 0.06);
+  --ho-overlay-subtle: rgb(255 255 255 / 0.06);
+  --ho-overlay-muted: rgb(255 255 255 / 0.11);
+  --ho-row-hover: rgb(255 255 255 / 0.04);
+  --ho-backdrop: rgb(10 10 10 / 0.58);
+}
+
+/* —— Light: soft mist floor, crisp cards, same sage & gold —— */
+html[data-theme="light"] {
+  color-scheme: light;
+  --ho-background: #e5e5e5;
+  --ho-surface: #f7f7f7;
+  --ho-border: #c8c8c8;
+  --ho-field: #ffffff;
+  --ho-foreground: #1e1e1e;
+  --ho-muted: #5c5c5c;
+  --ho-accent: #618b79;
+  --ho-accent-muted: #4d7266;
+  --ho-accent-foreground: #f7f7f7;
+  --ho-highlight: #f9d249;
+  --ho-highlight-foreground: #1e1e1e;
+  --ho-warning: #b8921a;
+  --ho-danger: #b54747;
+  --ho-danger-foreground: #5c2020;
+
+  --ho-status-pending-bg: rgb(92 92 92 / 0.1);
+  --ho-status-assigned-bg: rgb(97 139 121 / 0.18);
+  --ho-status-assigned-fg: #3d5c50;
+  --ho-status-progress-bg: rgb(249 210 73 / 0.35);
+  --ho-status-progress-fg: #5c4a0a;
+  --ho-status-done-bg: rgb(97 139 121 / 0.28);
+  --ho-status-done-fg: #2d4a40;
+  --ho-status-cancelled-bg: rgb(181 71 71 / 0.14);
+  --ho-status-cancelled-fg: #8f2f2f;
+
+  --ho-nav-active-bg: rgb(97 139 121 / 0.2);
+  --ho-nav-hover-bg: rgb(30 30 30 / 0.05);
+  --ho-overlay-subtle: rgb(30 30 30 / 0.05);
+  --ho-overlay-muted: rgb(30 30 30 / 0.09);
+  --ho-row-hover: rgb(30 30 30 / 0.04);
+  --ho-backdrop: rgb(30 30 30 / 0.42);
+}
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --color-background: var(--ho-background);
+  --color-surface: var(--ho-surface);
+  --color-border: var(--ho-border);
+  --color-field: var(--ho-field);
+  --color-foreground: var(--ho-foreground);
+  --color-muted: var(--ho-muted);
+  --color-accent: var(--ho-accent);
+  --color-accent-muted: var(--ho-accent-muted);
+  --color-accent-foreground: var(--ho-accent-foreground);
+  --color-highlight: var(--ho-highlight);
+  --color-highlight-foreground: var(--ho-highlight-foreground);
+  --color-warning: var(--ho-warning);
+  --color-danger: var(--ho-danger);
+  --color-danger-foreground: var(--ho-danger-foreground);
+
+  --color-status-pending-bg: var(--ho-status-pending-bg);
+  --color-status-assigned-bg: var(--ho-status-assigned-bg);
+  --color-status-assigned-fg: var(--ho-status-assigned-fg);
+  --color-status-progress-bg: var(--ho-status-progress-bg);
+  --color-status-progress-fg: var(--ho-status-progress-fg);
+  --color-status-done-bg: var(--ho-status-done-bg);
+  --color-status-done-fg: var(--ho-status-done-fg);
+  --color-status-cancelled-bg: var(--ho-status-cancelled-bg);
+  --color-status-cancelled-fg: var(--ho-status-cancelled-fg);
+
+  --color-nav-active-bg: var(--ho-nav-active-bg);
+  --color-nav-hover-bg: var(--ho-nav-hover-bg);
+  --color-overlay-subtle: var(--ho-overlay-subtle);
+  --color-overlay-muted: var(--ho-overlay-muted);
+  --color-row-hover: var(--ho-row-hover);
+  --color-backdrop: var(--ho-backdrop);
+
+  --radius-lg: 0.625rem;
+  --radius-md: 0.5rem;
+  --radius-full: 9999px;
+}
