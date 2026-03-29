@@ -86,13 +86,11 @@ export function LocationPickerMap({
       <MapContainer
         center={center}
         zoom={zoom}
-        className="isolate h-full w-full [&_.leaflet-control-zoom]:border-border"
+        className="isolate h-full w-full [&_.leaflet-control-zoom]:border-border [&_.leaflet-control-attribution]:hidden"
         scrollWheelZoom
+        attributionControl={false}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MapViewSync center={center} zoom={zoom} />
         <MapClickPlace onPlace={onPositionChange} />
         {position ? (
