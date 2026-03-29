@@ -32,7 +32,7 @@ describe("App", () => {
     });
   });
 
-  it("shows sign-in at /login", async () => {
+  it("shows sign-in chooser at /login", async () => {
     render(
       <MemoryRouter initialEntries={["/login"]}>
         <App />
@@ -41,6 +41,22 @@ describe("App", () => {
     await waitFor(() => {
       expect(
         screen.getByRole("heading", { name: "Sign in" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: /Continue as client/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("shows client sign-in at /login/client", async () => {
+    render(
+      <MemoryRouter initialEntries={["/login/client"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Client sign in" }),
       ).toBeInTheDocument();
     });
   });
