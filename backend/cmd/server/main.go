@@ -23,7 +23,23 @@ func main() {
 		addr = ":" + v
 	}
 
-	st := store.NewMemory()
+	var st store.Store
+	if os.Getenv("HAVENOPS_USE_MEMORY") == "1" {
+		st = store.NewMemory()
+	} else {
+		path := os.Getenv("HAVENOPS_SQLITE_PATH")
+		if path == "" {
+			path = "havenops.db"
+		}
+		sqlite, err := store.OpenSQLite(path)
+		if err != nil {
+			log.Fatalf("sqlite: %v", err)
+		}
+		defer func() { _ = sqlite.Close() }()
+		st = sqlite
+		log.Printf("using SQLite store at %s", path)
+	}
+
 	if err := bootstrap.SeedAdmin(st, os.Getenv("HAVENOPS_ADMIN_EMAIL"), os.Getenv("HAVENOPS_ADMIN_PASSWORD")); err != nil {
 		log.Fatalf("seed admin: %v", err)
 	}
