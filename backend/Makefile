@@ -21,7 +21,8 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z0-9_.-]+:.*?##' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Examples:"
-	@echo "  make run                    # dev server on :8080"
+	@echo "  make run                    # dev server on :8080 (SQLite havenops.db in cwd)"
+	@echo "  HAVENOPS_USE_MEMORY=1 make run  # in-memory store (no DB file)"
 	@echo "  HAVENOPS_SEED_DEMO=1 make run   # dev server + demo clients/jobs/users (password: havenops123)"
 	@echo "  PORT=3000 make run          # dev server on :3000 (Unix / Git Bash)"
 	@echo "  make release                # cross-compile to $(DIST_DIR)/"
