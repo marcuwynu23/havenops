@@ -68,7 +68,7 @@ export function Modal({
   return createPortal(
     <div
       className={cn(
-        "fixed inset-0 z-[100] flex flex-col justify-end md:items-center md:justify-center md:p-4",
+        "fixed inset-0 z-[200] md:flex md:items-center md:justify-center md:p-4",
         className,
       )}
       role="presentation"
@@ -77,7 +77,7 @@ export function Modal({
         type="button"
         tabIndex={-1}
         aria-hidden
-        className="absolute inset-0 cursor-default border-0 bg-backdrop p-0 backdrop-blur-[1px]"
+        className="absolute inset-0 cursor-default border-0 bg-backdrop p-0 md:backdrop-blur-[1px]"
         onClick={onClose}
       />
       <div
@@ -87,16 +87,17 @@ export function Modal({
         aria-describedby={description ? descriptionId : undefined}
         className={cn(
           sheetPanelClassName(),
-          "relative z-10 md:mx-auto",
+          "z-10 w-full max-md:absolute max-md:inset-x-0 max-md:bottom-0",
+          "md:relative md:mx-auto",
           sizeClass[size],
           panelClassName,
         )}
       >
-        <SheetDragHandle />
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 py-3 sm:px-5 sm:py-4">
+        <SheetDragHandle className="pt-2 pb-1" />
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 pb-3 pt-1 md:px-5 md:py-4">
           <h2
             id={titleId}
-            className="font-display text-base font-semibold text-foreground max-md:text-lg sm:text-lg"
+            className="font-display text-lg font-semibold text-foreground"
           >
             {title}
           </h2>
@@ -114,12 +115,14 @@ export function Modal({
         {description ? (
           <p
             id={descriptionId}
-            className="shrink-0 border-b border-border px-4 py-2 text-xs leading-relaxed text-muted sm:px-5 sm:text-sm"
+            className="shrink-0 border-b border-border px-4 py-2 text-xs leading-relaxed text-muted md:px-5 md:text-sm"
           >
             {description}
           </p>
         ) : null}
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:p-5">
+          {children}
+        </div>
       </div>
     </div>,
     document.body,
