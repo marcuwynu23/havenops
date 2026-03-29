@@ -13,18 +13,19 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - React 19 + TypeScript (Vite 8)
 - React Router 7
 - Tailwind CSS v4 with `@tailwindcss/vite`
-- Zustand: **`authStore`**, **`themeStore`** (appearance preference + `localStorage`)
-- **TanStack Query** (`@tanstack/react-query`): **`QueryProvider`** in `main.tsx`; shared keys in **`lib/queryKeys.ts`**; **`useClientsQuery` / `useEmployeesQuery` / `useJobsQuery`** (`hooks/useHavenOpsQueries.ts`); **`useMutation`** + **`invalidateQueries`** for job assign/status, employee create/toggle, client booking (**`JobTable`**, **`BookingForm`**, **`EmployeesPage`**)
+- Zustand: `**authStore**`, `**themeStore**` (appearance preference + `localStorage`)
+- **TanStack Query** (`@tanstack/react-query`): `**QueryProvider`** in `main.tsx`; shared keys in `**lib/queryKeys.ts**`; `**useClientsQuery` / `useEmployeesQuery` / `useJobsQuery**` (`hooks/useHavenOpsQueries.ts`); `**useMutation**` + `**invalidateQueries**` for job assign/status, employee create/toggle, client booking (`**JobTable**`, `**BookingForm**`, `**EmployeesPage**`)
 - Vitest + Testing Library + jsdom
-- Centralized UI kit under `frontend/src/components/ui` (Button variants including **`highlight`**, Card, Field, Input, Select, Textarea, Table, Badge, Alert, PageHeader, StatCard, StatsGrid, FormGrid, RowActions, Muted, responsive table helpers, etc.)
-- **Brand theme** in `frontend/src/styles/theme.css`: cleaning-service palette (**`#1e1e1e`**, **`#e5e5e5`**, **`#618b79`**, **`#f9d249`**) with **light** and **dark** modes via `html[data-theme]`; tokens include `highlight`, `nav-hover`, `backdrop`, job status colors
-- **`ThemeSync`** + inline script in `index.html` to avoid theme flash; preference **Light / Dark / System** (`localStorage` key `havenops-theme-preference`)
-- **`ThemePreferenceControl`**: sidebar (authenticated) + fixed corner on auth pages
-- **`Modal`**: reusable dialog (portal, backdrop, Escape); **Add employee** flow uses it
-- **Layout:** **`AdminShell`** — desktop sidebar with icons; **mobile** Material-style **top app bar**, **bottom navigation** (multi-tab admin; single-role + **Account** tab), **account bottom sheet** (theme, email, logout); safe-area aware
-- **Public marketing `LandingPage`** at **`/`** (hero, feature cards, CTAs to register / staff login); signed-in users are redirected to `roleHome`
-- **`RequireAuth`**, role gates in `App.tsx` (`AdminGate`, `EmployeeGate`, `ClientGate`); admin app lives under **`/dashboard`**
-- **Route-level code splitting:** **`React.lazy`** + **`Suspense`** in `App.tsx` — each top-level page (`marketing/`, `auth/…`, `admin/`, `employee/`, `client/`) loads as its own **Vite async chunk**; global fallback UI while chunks load
+- Centralized UI kit under `frontend/src/components/ui` (Button variants including `**highlight**`, Card, Field, Input, Select, Textarea, Table, Badge, Alert, PageHeader, StatCard, StatsGrid, FormGrid, RowActions, Muted, responsive table helpers, etc.)
+- **Brand theme** in `frontend/src/styles/theme.css`: cleaning-service palette (`**#1e1e1e`**, `**#e5e5e5**`, `**#618b79**`, `**#f9d249**`) with **light** and **dark** modes via `html[data-theme]`; tokens include `highlight`, `nav-hover`, `backdrop`, job status colors
+- `**ThemeSync`** + inline script in `index.html` to avoid theme flash; preference **Light / Dark / System** (`localStorage` key `havenops-theme-preference`)
+- `**ThemePreferenceControl`**: sidebar (authenticated) + fixed corner on auth pages
+- `**Modal**`: reusable dialog (portal, backdrop, Escape); **Add employee** flow uses it
+- **Layout:** `**AdminShell`** — desktop sidebar with icons; **mobile** Material-style **top app bar**, **bottom navigation** (multi-tab admin; single-role + **Account** tab), **account bottom sheet** (theme, email, logout); safe-area aware
+- **Public marketing `LandingPage`** at `**/**` (hero, feature cards, CTAs to register / staff login); signed-in users are redirected to `roleHome`
+- `**RequireAuth**`, role gates in `App.tsx` (`AdminGate`, `EmployeeGate`, `ClientGate`); admin app lives under `**/dashboard**`
+- **Route-level code splitting:** `**React.lazy`** + `**Suspense**` in `App.tsx` — each top-level page (`marketing/`, `auth/…`, `admin/`, `employee/`, `client/`) loads as its own **Vite async chunk**; global fallback UI while chunks load
+
 ### Frontend (planned)
 
 - Capacitor (Android)
@@ -34,11 +35,11 @@ HavenOps is a single-tenant home service management system designed for a cleani
 ### Backend (current)
 
 - Go with Chi router
-- REST API mounted at **`/api`**
+- REST API mounted at `**/api`**
 - **In-memory store** implementing `store.Store` (`internal/store/memory.go`) — swap for SQLite/Postgres later without changing handler contracts
 - JWT access tokens (HS256), bcrypt passwords (`internal/auth`)
 - Optional first-run admin seed via environment variables
-- Optional **demo dataset**: **`HAVENOPS_SEED_DEMO=1`** — sample clients, employees, client user, jobs (`internal/bootstrap/seed_demo.go`); shared demo password documented in logs / Makefile
+- Optional **demo dataset**: `**HAVENOPS_SEED_DEMO=1`** — sample clients, employees, client user, jobs (`internal/bootstrap/seed_demo.go`); shared demo password documented in logs / Makefile
 - **Makefile** in `backend/` — `make help`, `run`, `test`, `fmt`, `vet`, `build`, `release` (cross-compile), `checksums`, etc. Run from `backend/`; on Windows use Git Bash, MSYS2, or WSL if `make` is unavailable and invoke the documented `go` commands instead.
 
 ### Backend (planned)
@@ -62,7 +63,7 @@ HavenOps is a single-tenant home service management system designed for a cleani
 
 - **No admin-created clients:** `POST /api/clients` returns **403**; clients come only from **self-service registration**
 - **Admin:** read-only **directory** (`GET /clients` — full list)
-- **Client:** sees only self; **only clients** may **`POST /jobs`** (booking) for own `client_id`
+- **Client:** sees only self; **only clients** may `**POST /jobs`** (booking) for own `client_id`
 - **Employee:** clients that appear on assigned jobs (scoped list)
 
 ### 3. Job management
@@ -71,7 +72,7 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - List/filter jobs by role (admin: all + manual assign; employee: assigned; client: own)
 - Track status: `pending` → `assigned` → `in_progress` → `done`; `cancelled` allowed
 - Admin: manual reassignment (`PATCH .../assign`)
-- **Queued jobs:** if no employee is free in the scheduled **time window** (default slot + padding), job stays **`pending`** until manual assign or capacity changes
+- **Queued jobs:** if no employee is free in the scheduled **time window** (default slot + padding), job stays `**pending`** until manual assign or capacity changes
 
 ### 4. Employee management
 
@@ -84,8 +85,8 @@ HavenOps is a single-tenant home service management system designed for a cleani
 
 ### 6. Surfaces
 
-- **Marketing landing:** **`/`** — product intro, client + staff entry points; unauthenticated unknown routes redirect to **`/`** (guests) or **`roleHome`** (signed-in)
-- **Admin console:** **`/dashboard`**, **`/dashboard/jobs`**, **`/dashboard/clients`**, **`/dashboard/employees`**
+- **Marketing landing:** `**/`** — product intro, client + staff entry points; unauthenticated unknown routes redirect to `**/**` (guests) or `**roleHome**` (signed-in)
+- **Admin console:** `**/dashboard`**, `**/dashboard/jobs**`, `**/dashboard/clients**`, `**/dashboard/employees**`
 - **Employee app:** `/app` — assigned jobs, status updates on assigned jobs only
 - **Client portal:** `/portal` — own jobs, **Request booking** (gold CTA)
 - **Public auth pages:** `/login`, `/register`, `/forgot-password`, `/reset-password`
@@ -135,7 +136,7 @@ HavenOps is a single-tenant home service management system designed for a cleani
 
 ## API (`/api/...`)
 
-All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
+All resource routes require `**Authorization: Bearer <jwt>`** unless noted.
 
 ### Auth (public)
 
@@ -152,7 +153,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 - `POST /api/clients` — **403** (self-service registration only)
 - `GET /api/clients` — scoped by role
-- **(Planned)** `PATCH /api/clients/me` or `PATCH /api/clients/{id}` — **client** may update own **`address`**, **`latitude`**, **`longitude`** (validate ranges; optional admin override later). Responses include coordinates when present so the portal and job views can render maps.
+- **(Planned)** `PATCH /api/clients/me` or `PATCH /api/clients/{id}` — **client** may update own `**address`**, `**latitude**`, `**longitude**` (validate ranges; optional admin override later). Responses include coordinates when present so the portal and job views can render maps.
 
 ### Employees
 
@@ -202,30 +203,30 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Pages
 
-- Organized under **`pages/marketing`**, **`pages/auth/login|register|recovery`**, **`pages/admin`**, **`pages/employee`**, **`pages/client`** — each default export **lazy-imported** from `App.tsx` for smaller initial bundle
-- **`LandingPage`** (`/`)
+- Organized under `**pages/marketing`**, `**pages/auth/login|register|recovery**`, `**pages/admin**`, `**pages/employee**`, `**pages/client**` — each default export **lazy-imported** from `App.tsx` for smaller initial bundle
+- `**LandingPage`** (`/`)
 - `Dashboard`, `JobsPage`, `ClientsPage`, `EmployeesPage` (admin; nested under `/dashboard`)
 - `EmployeeApp`, `ClientPortal` (planned: **client location / map** editor on portal; **job-level map** for employees)
 - `LoginPage` (chooser), `ClientLoginPage`, `EmployeeLoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`
 
 ### Components
 
-- **`BookingForm`** (client portal only; primary submit **`highlight`** / gold)
-- **`JobTable`** (admin / employee / client modes + responsive list)
-- **(Planned)** **`LocationMap`** / **`ClientLocationEditor`** — map library wrapper; client portal **picker** + employee **read-only** job/client location; optional **`AddressFields`** shared with registration
-- **`Modal`**, **`ThemeSync`**, **`ThemePreferenceControl`**
-- **`AdminShell`** (desktop sidebar + mobile app bar / bottom nav / account sheet); nav config includes **`icon`** + **`mobileLabel`**
+- `**BookingForm`** (client portal only; primary submit `**highlight**` / gold)
+- `**JobTable**` (admin / employee / client modes + responsive list)
+- **(Planned)** `**LocationMap`** / `**ClientLocationEditor**` — map library wrapper; client portal **picker** + employee **read-only** job/client location; optional `**AddressFields`** shared with registration
+- `**Modal**`, `**ThemeSync**`, `**ThemePreferenceControl**`
+- `**AdminShell**` (desktop sidebar + mobile app bar / bottom nav / account sheet); nav config includes `**icon**` + `**mobileLabel**`
 - `RequireAuth`, role gates in `App.tsx`
-- Reusable UI under `components/ui/` and **`components/layout/`**
+- Reusable UI under `components/ui/` and `**components/layout/**`
 
 ### State
 
-- **`authStore`:** token, user, login/register/logout, `roleHome` (admin → `/dashboard`)
-- **`themeStore`:** `light` | `dark` | `system`, persisted
+- `**authStore`:** token, user, login/register/logout, `roleHome` (admin → `/dashboard`)
+- `**themeStore`:** `light` | `dark` | `system`, persisted
 
 ### Data fetching
 
-- **TanStack Query** for **`/api`** reads/writes: **`createAppQueryClient`** (`lib/createQueryClient.ts`), **`queryKeys`**, composable **`use*Query`** hooks; **`api.ts`** stays thin; **`createTestQueryClient`** for Vitest
+- **TanStack Query** for `**/api`** reads/writes: `**createAppQueryClient**` (`lib/createQueryClient.ts`), `**queryKeys**`, composable `**use*Query**` hooks; `**api.ts**` stays thin; `**createTestQueryClient**` for Vitest
 
 ---
 
@@ -238,7 +239,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 ### Phase 2 – Frontend MVP — **done**
 
 - Vite React app, API client with Bearer token, job views, Vitest
-- **Public landing** at **`/`** (value proposition, register + staff sign-in); **admin shell** routes under **`/dashboard`** so marketing and app URLs stay separate
+- **Public landing** at `**/`** (value proposition, register + staff sign-in); **admin shell** routes under `**/dashboard`** so marketing and app URLs stay separate
 
 ### Phase 3 – Employee system — **done**
 
@@ -262,9 +263,9 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Phase 5b – TanStack Query — **done**
 
-- **`@tanstack/react-query`**, **`QueryProvider`** wrapping **`App`** in **`main.tsx`**
-- Admin pages + **`EmployeeApp`** / **`ClientPortal`** use **`useQuery`**; **`JobTable`**, **`BookingForm`**, **`EmployeesPage`** use **`useMutation`** + **`invalidateQueries`**; removed **`havenopsStore`**
-- Vitest: **`QueryClientProvider`** + **`createTestQueryClient`** in **`App.test.tsx`**
+- `**@tanstack/react-query`**, `**QueryProvider**` wrapping `**App**` in `**main.tsx**`
+- Admin pages + `**EmployeeApp**` / `**ClientPortal**` use `**useQuery**`; `**JobTable**`, `**BookingForm**`, `**EmployeesPage**` use `**useMutation**` + `**invalidateQueries**`; removed `**havenopsStore**`
+- Vitest: `**QueryClientProvider**` + `**createTestQueryClient**` in `**App.test.tsx**`
 
 ### Phase 6 – Persistence
 
@@ -280,7 +281,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Phase 9 – Client location & maps (planned)
 
-- Backend: extend **`clients`** with **`latitude`** / **`longitude`**; authenticated **client** `PATCH` for address + coordinates; include coords in job/client payloads where role allows
+- Backend: extend `**clients**` with `**latitude**` / `**longitude**`; authenticated **client** `PATCH` for address + coordinates; include coords in job/client payloads where role allows
 - Frontend: **map library** dependency, env for any provider keys; **client portal** section to set home address + map pin; **employee** (and admin) job UI showing **client address + map** when coordinates exist
 - Tests: API validation for geo bounds; smoke tests for map mount (optional mock)
 
@@ -337,7 +338,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 - Employees sign in, see **assigned** work, update status; **mobile-friendly** shell and **theme** toggle
 - Auth flows end-to-end; recovery token delivery TBD outside dev
 - **Demo seed** optional for local demos; Makefile supports backend **build/test/release**
-- **Landing** introduces the product; **logout** returns guests to **`/`**
+- **Landing** introduces the product; **logout** returns guests to `**/`**
 
 ---
 
@@ -346,3 +347,4 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 - Keep the system simple and fast; avoid overengineering for the single-tenant MVP
 - In-memory store: process restart loses data until Phase 6 persistence
 - Focus on real business usage; Capacitor/Electron follow after web + persistence are stable
+
