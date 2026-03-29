@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import JobTable from "../components/JobTable";
+import JobTable from "../../components/JobTable";
 import {
   Alert,
   Card,
@@ -7,8 +7,8 @@ import {
   PageHeader,
   StatCard,
   StatsGrid,
-} from "../components/ui";
-import { useHavenOpsStore } from "../store/havenopsStore";
+} from "../../components/ui";
+import { useHavenOpsStore } from "../../store/havenopsStore";
 
 export default function Dashboard() {
   const jobs = useHavenOpsStore((s) => s.jobs);

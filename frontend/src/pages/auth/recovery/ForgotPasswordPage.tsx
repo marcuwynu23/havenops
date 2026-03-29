@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { authRecoveryRequest } from "../api";
-import { ThemePreferenceControl } from "../components/ThemePreferenceControl";
+import { authRecoveryRequest } from "../../../api";
+import { ThemePreferenceControl } from "../../../components/ThemePreferenceControl";
 import {
   Alert,
   Button,
@@ -11,7 +11,7 @@ import {
   Input,
   Muted,
   PageHeader,
-} from "../components/ui";
+} from "../../../components/ui";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");

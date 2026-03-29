@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ThemePreferenceControl } from "../components/ThemePreferenceControl";
+import { ThemePreferenceControl } from "../../../components/ThemePreferenceControl";
 import {
   Alert,
   Button,
@@ -10,8 +10,8 @@ import {
   Input,
   PageHeader,
   Textarea,
-} from "../components/ui";
-import { roleHome, useAuthStore } from "../store/authStore";
+} from "../../../components/ui";
+import { roleHome, useAuthStore } from "../../../store/authStore";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -117,8 +117,8 @@ export default function RegisterPage() {
           </FormGrid>
           <p className="mt-4 text-center text-sm text-muted">
             Already have an account?{" "}
-            <Link to="/login" className="text-accent">
-              Sign in
+            <Link to="/login/client" className="text-accent">
+              Client sign in
             </Link>
           </p>
         </Card>

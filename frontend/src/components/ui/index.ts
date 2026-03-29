@@ -14,7 +14,12 @@ export { RowActions } from "./RowActions";
 export { Input, type InputProps } from "./Input";
 export { Muted } from "./Muted";
 export { PageHeader, type PageHeaderProps } from "./PageHeader";
-export { Select, type SelectProps } from "./Select";
+export {
+  Select,
+  type SelectChangeEvent,
+  type SelectOption,
+  type SelectProps,
+} from "./Select";
 export { StatCard, type StatCardProps } from "./StatCard";
 export { StatsGrid, type StatsGridProps } from "./StatsGrid";
 export {

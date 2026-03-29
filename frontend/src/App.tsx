@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import {
   Navigate,
   Outlet,
@@ -9,19 +9,34 @@ import {
 import { AdminShell, type NavItemConfig } from "./components/layout/AdminShell";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { Button } from "./components/ui";
-import Dashboard from "./pages/Dashboard";
-import ClientsPage from "./pages/ClientsPage";
-import JobsPage from "./pages/JobsPage";
-import EmployeesPage from "./pages/EmployeesPage";
-import EmployeeApp from "./pages/EmployeeApp";
-import ClientPortal from "./pages/ClientPortal";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import LandingPage from "./pages/LandingPage";
 import { ThemePreferenceControl } from "./components/ThemePreferenceControl";
 import { roleHome, useAuthStore } from "./store/authStore";
+
+const LandingPage = lazy(() => import("./pages/marketing/LandingPage"));
+const LoginPage = lazy(() => import("./pages/auth/login/LoginPage"));
+const ClientLoginPage = lazy(() => import("./pages/auth/login/ClientLoginPage"));
+const EmployeeLoginPage = lazy(
+  () => import("./pages/auth/login/EmployeeLoginPage"),
+);
+const RegisterPage = lazy(() => import("./pages/auth/register/RegisterPage"));
+const ForgotPasswordPage = lazy(
+  () => import("./pages/auth/recovery/ForgotPasswordPage"),
+);
+const ResetPasswordPage = lazy(
+  () => import("./pages/auth/recovery/ResetPasswordPage"),
+);
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
+const JobsPage = lazy(() => import("./pages/admin/JobsPage"));
+const EmployeesPage = lazy(() => import("./pages/admin/EmployeesPage"));
+const EmployeeApp = lazy(() => import("./pages/employee/EmployeeApp"));
+const ClientPortal = lazy(() => import("./pages/client/ClientPortal"));
+
+const routeFallback = (
+  <div className="flex min-h-screen items-center justify-center bg-background text-muted">
+    Loading…
+  </div>
+);
 
 const ADMIN_NAV: NavItemConfig[] = [
   {
@@ -162,29 +177,33 @@ function CatchAllRedirect() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Suspense fallback={routeFallback}>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/client" element={<ClientLoginPage />} />
+        <Route path="/login/employee" element={<EmployeeLoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      <Route element={<RequireAuth />}>
-        <Route path="/dashboard" element={<AdminGate />}>
-          <Route index element={<Dashboard />} />
-          <Route path="jobs" element={<JobsPage />} />
-          <Route path="clients" element={<ClientsPage />} />
-          <Route path="employees" element={<EmployeesPage />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/dashboard" element={<AdminGate />}>
+            <Route index element={<Dashboard />} />
+            <Route path="jobs" element={<JobsPage />} />
+            <Route path="clients" element={<ClientsPage />} />
+            <Route path="employees" element={<EmployeesPage />} />
+          </Route>
+          <Route path="/app" element={<EmployeeGate />}>
+            <Route index element={<EmployeeApp />} />
+          </Route>
+          <Route path="/portal" element={<ClientGate />}>
+            <Route index element={<ClientPortal />} />
+          </Route>
         </Route>
-        <Route path="/app" element={<EmployeeGate />}>
-          <Route index element={<EmployeeApp />} />
-        </Route>
-        <Route path="/portal" element={<ClientGate />}>
-          <Route index element={<ClientPortal />} />
-        </Route>
-      </Route>
 
-      <Route path="*" element={<CatchAllRedirect />} />
-    </Routes>
+        <Route path="*" element={<CatchAllRedirect />} />
+      </Routes>
+    </Suspense>
   );
 }

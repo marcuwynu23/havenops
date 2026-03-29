@@ -264,7 +264,9 @@ export function AdminShell({
   return (
     <div
       className={cn(
-        "flex min-h-[100dvh] flex-col bg-background lg:grid lg:min-h-screen lg:grid-cols-[240px_1fr]",
+        /* Fixed viewport height + min-h-0 so <main> can shrink and scroll (mobile long lists). */
+        "flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background",
+        "lg:grid lg:h-screen lg:min-h-0 lg:grid-cols-[240px_1fr] lg:overflow-hidden",
         className,
       )}
     >
@@ -297,7 +299,7 @@ export function AdminShell({
       {/* —— Desktop sidebar —— */}
       <aside
         className={cn(
-          "hidden flex-col gap-1 border-border bg-surface p-3 lg:flex lg:border-r",
+          "hidden min-h-0 flex-col gap-1 overflow-y-auto border-border bg-surface p-3 lg:flex lg:border-r",
           sidebarClassName,
         )}
       >
@@ -334,7 +336,7 @@ export function AdminShell({
       {/* —— Main content —— */}
       <main
         className={cn(
-          "w-full min-w-0 flex-1 overflow-y-auto overscroll-contain",
+          "min-h-0 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain",
           showMobileBottomBar
             ? "pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] lg:pb-10"
             : "pb-6 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] lg:pb-10",

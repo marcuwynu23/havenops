@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
-import JobTable from "../components/JobTable";
-import { Alert, Card, CardTitle, PageHeader } from "../components/ui";
-import { useHavenOpsStore } from "../store/havenopsStore";
+import JobTable from "../../components/JobTable";
+import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
+import { useHavenOpsStore } from "../../store/havenopsStore";
 
 export default function JobsPage() {
   const jobs = useHavenOpsStore((s) => s.jobs);

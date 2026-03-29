@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { authRecoveryReset } from "../api";
-import { ThemePreferenceControl } from "../components/ThemePreferenceControl";
+import { authRecoveryReset } from "../../../api";
+import { ThemePreferenceControl } from "../../../components/ThemePreferenceControl";
 import {
   Alert,
   Button,
@@ -10,7 +10,7 @@ import {
   FormGrid,
   Input,
   PageHeader,
-} from "../components/ui";
+} from "../../../components/ui";
 
 export default function ResetPasswordPage() {
   const [params] = useSearchParams();

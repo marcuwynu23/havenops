@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Client, Job } from "../api";
-import { getClients, getJobs } from "../api";
-import BookingForm from "../components/BookingForm";
-import JobTable from "../components/JobTable";
-import { Alert, Card, CardTitle, PageHeader } from "../components/ui";
+import type { Client, Job } from "../../api";
+import { getClients, getJobs } from "../../api";
+import JobTable from "../../components/JobTable";
+import { Alert, Card, CardTitle, PageHeader } from "../../components/ui";
 
-export default function ClientPortal() {
+export default function EmployeeApp() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -30,24 +29,25 @@ export default function ClientPortal() {
     [clients],
   );
 
+  // Employees need client names for the table; API allows getClients only for admin.
+  // If forbidden, JobTable still shows client_id.
+  const employees: import("../../api").Employee[] = [];
+
   return (
     <>
       <PageHeader
-        title="My bookings"
-        description="Request service and track your jobs."
+        title="My jobs"
+        description="Jobs assigned to you. Update status as you work."
       />
       {error ? <Alert className="mb-4">{error}</Alert> : null}
       <Card>
-        <CardTitle>New booking</CardTitle>
-        <BookingForm onCreated={load} />
-      </Card>
-      <Card>
-        <CardTitle>Your jobs</CardTitle>
+        <CardTitle>Assigned work</CardTitle>
         <JobTable
           jobs={jobs}
           clients={clientMap}
-          employees={[]}
-          mode="client"
+          employees={employees}
+          mode="employee"
+          onChanged={load}
         />
       </Card>
     </>

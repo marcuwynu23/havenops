@@ -136,14 +136,14 @@ export default function JobTable({
                             disabled={
                               j.status === "done" || j.status === "cancelled"
                             }
-                          >
-                            <option value="">Unassigned</option>
-                            {activeEmps.map((e) => (
-                              <option key={e.id} value={e.id}>
-                                {e.name}
-                              </option>
-                            ))}
-                          </Select>
+                            options={[
+                              { value: "", label: "Unassigned" },
+                              ...activeEmps.map((e) => ({
+                                value: e.id,
+                                label: e.name,
+                              })),
+                            ]}
+                          />
                           {j.status !== "done" && j.status !== "cancelled" ? (
                             <>
                               {j.status === "assigned" ? (
@@ -242,14 +242,14 @@ export default function JobTable({
                         disabled={
                           j.status === "done" || j.status === "cancelled"
                         }
-                      >
-                        <option value="">Unassigned</option>
-                        {activeEmps.map((e) => (
-                          <option key={e.id} value={e.id}>
-                            {e.name}
-                          </option>
-                        ))}
-                      </Select>
+                        options={[
+                          { value: "", label: "Unassigned" },
+                          ...activeEmps.map((e) => ({
+                            value: e.id,
+                            label: e.name,
+                          })),
+                        ]}
+                      />
                       {j.status !== "done" && j.status !== "cancelled" ? (
                         <div className="flex flex-wrap gap-2">
                           {j.status === "assigned" ? (

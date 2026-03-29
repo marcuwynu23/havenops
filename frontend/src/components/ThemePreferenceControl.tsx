@@ -31,16 +31,14 @@ export function ThemePreferenceControl({
         aria-label="Theme appearance"
         className="w-full py-2 text-xs sm:text-sm"
         value={preference}
+        options={OPTIONS.map((o) => ({
+          value: o.value,
+          label: o.label,
+        }))}
         onChange={(e) =>
           setPreference(e.target.value as ThemePreference)
         }
-      >
-        {OPTIONS.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </Select>
+      />
     </div>
   );
 }

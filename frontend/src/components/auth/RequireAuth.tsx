@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { loginPathForProtectedRoute } from "../../lib/authRoutes";
 import { useAuthStore } from "../../store/authStore";
 
 export function RequireAuth() {
@@ -20,9 +21,8 @@ export function RequireAuth() {
     );
   }
   if (!token) {
-    return (
-      <Navigate to="/login" replace state={{ from: location.pathname }} />
-    );
+    const to = loginPathForProtectedRoute(location.pathname);
+    return <Navigate to={to} replace state={{ from: location.pathname }} />;
   }
   return <Outlet />;
 }

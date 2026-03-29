@@ -16,8 +16,8 @@ import {
   TableRow,
   Td,
   Th,
-} from "../components/ui";
-import { useHavenOpsStore } from "../store/havenopsStore";
+} from "../../components/ui";
+import { useHavenOpsStore } from "../../store/havenopsStore";
 
 export default function ClientsPage() {
   const clients = useHavenOpsStore((s) => s.clients);

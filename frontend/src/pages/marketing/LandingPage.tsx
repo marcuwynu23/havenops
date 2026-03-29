@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ThemePreferenceControl } from "../components/ThemePreferenceControl";
-import { buttonClassName, Card, CardTitle, Muted } from "../components/ui";
-import { roleHome, useAuthStore } from "../store/authStore";
+import { ThemePreferenceControl } from "../../components/ThemePreferenceControl";
+import { buttonClassName, Card, CardTitle, Muted } from "../../components/ui";
+import { roleHome, useAuthStore } from "../../store/authStore";
 
 const features = [
   {
@@ -75,7 +75,7 @@ export default function LandingPage() {
               Book as a client
             </Link>
             <Link
-              to="/login"
+              to="/login/employee"
               className={buttonClassName({
                 variant: "ghost",
                 className:
@@ -115,7 +115,10 @@ export default function LandingPage() {
               Create an account
             </Link>
             {" · "}
-            <Link to="/login" className="text-muted underline-offset-2 hover:text-foreground">
+            <Link
+              to="/login"
+              className="text-muted underline-offset-2 hover:text-foreground"
+            >
               Sign in
             </Link>
           </p>

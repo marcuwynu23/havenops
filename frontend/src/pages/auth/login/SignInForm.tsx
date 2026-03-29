@@ -1,6 +1,6 @@
-import { type FormEvent, useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ThemePreferenceControl } from "../components/ThemePreferenceControl";
+import { type FormEvent, useEffect, useState, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ThemePreferenceControl } from "../../../components/ThemePreferenceControl";
 import {
   Alert,
   Button,
@@ -9,10 +9,16 @@ import {
   FormGrid,
   Input,
   PageHeader,
-} from "../components/ui";
-import { roleHome, useAuthStore } from "../store/authStore";
+} from "../../../components/ui";
+import { roleHome, useAuthStore } from "../../../store/authStore";
 
-export default function LoginPage() {
+export type SignInFormProps = {
+  title: string;
+  description: string;
+  footer: ReactNode;
+};
+
+export function SignInForm({ title, description, footer }: SignInFormProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from;
@@ -50,7 +56,7 @@ export default function LoginPage() {
         u.role === "admin" &&
         from &&
         from !== "/login" &&
-        from !== "/"
+        !from.startsWith("/login/")
       ) {
         target = from;
       }
@@ -69,7 +75,7 @@ export default function LoginPage() {
         className="fixed right-3 top-3 z-[90] w-[9rem] sm:right-5 sm:top-4"
       />
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
-        <PageHeader title="Sign in" description="HavenOps account" />
+        <PageHeader title={title} description={description} />
         <Card className="mb-0">
           <FormGrid onSubmit={onSubmit}>
             {error ? <Alert className="col-span-full">{error}</Alert> : null}
@@ -97,15 +103,7 @@ export default function LoginPage() {
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </FormGrid>
-          <p className="mt-4 text-center text-sm text-muted">
-            <Link to="/register" className="text-accent">
-              Create a client account
-            </Link>
-            {" · "}
-            <Link to="/forgot-password" className="text-accent">
-              Forgot password?
-            </Link>
-          </p>
+          {footer}
         </Card>
       </div>
     </>

@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
-import type { Employee } from "../api";
-import { createEmployee, setEmployeeActive } from "../api";
-import { Modal } from "../components/Modal";
+import type { Employee } from "../../api";
+import { createEmployee, setEmployeeActive } from "../../api";
+import { Modal } from "../../components/Modal";
 import {
   Alert,
   Badge,
@@ -24,8 +24,8 @@ import {
   TableRow,
   Td,
   Th,
-} from "../components/ui";
-import { useHavenOpsStore } from "../store/havenopsStore";
+} from "../../components/ui";
+import { useHavenOpsStore } from "../../store/havenopsStore";
 
 export default function EmployeesPage() {
   const employees = useHavenOpsStore((s) => s.employees);
