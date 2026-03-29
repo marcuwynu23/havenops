@@ -102,7 +102,11 @@ export default function JobTable({
   }
 
   if (jobs.length === 0) {
-    return <Muted>No jobs yet.</Muted>;
+    return (
+      <Muted>
+        {mode === "client" ? "No bookings yet." : "No jobs yet."}
+      </Muted>
+    );
   }
 
   const showActions = mode !== "client";
