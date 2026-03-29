@@ -23,11 +23,14 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - **Layout:** **`AdminShell`** — desktop sidebar with icons; **mobile** Material-style **top app bar**, **bottom navigation** (multi-tab admin; single-role + **Account** tab), **account bottom sheet** (theme, email, logout); safe-area aware
 - **Public marketing `LandingPage`** at **`/`** (hero, feature cards, CTAs to register / staff login); signed-in users are redirected to `roleHome`
 - **`RequireAuth`**, role gates in `App.tsx` (`AdminGate`, `EmployeeGate`, `ClientGate`); admin app lives under **`/dashboard`**
+- **Route-level code splitting:** **`React.lazy`** + **`Suspense`** in `App.tsx` — each top-level page (`marketing/`, `auth/…`, `admin/`, `employee/`, `client/`) loads as its own **Vite async chunk**; global fallback UI while chunks load
+- **(Planned)** **TanStack Query** (`@tanstack/react-query`, formerly React Query) for **server state**: `useQuery` / `useMutation` for jobs, clients, employees, and related API calls; **cache**, **invalidation**, **loading/error** semantics, deduped requests; **`QueryClientProvider`** at app root. Migrate incrementally from **`havenopsStore`** list-fetch patterns; keep **Zustand** for **auth** and **theme** (and any purely client UI state)
 
 ### Frontend (planned)
 
 - Capacitor (Android)
 - Electron (Windows desktop)
+- **Maps:** embed a **map library** for location UX (e.g. **Leaflet** + `react-leaflet`, or **MapLibre GL** / Mapbox-style stack). Use it for **client** address + coordinate picking and for **read-only** job/client location views for **employees** (and admin). Store **API keys** (if any) in env; prefer OSS tiles (e.g. OpenStreetMap) where licensing allows.
 
 ### Backend (current)
 
@@ -88,7 +91,20 @@ HavenOps is a single-tenant home service management system designed for a cleani
 - **Client portal:** `/portal` — own jobs, **Request booking** (gold CTA)
 - **Public auth pages:** `/login`, `/register`, `/forgot-password`, `/reset-password`
 
-### 7. UX & responsiveness (done)
+### 7. Client location, home address & maps (planned)
+
+- **Client portal — profile / location**
+  - Edit **home address** (structured text, aligned with registration `address` field).
+  - **Map** UI to **set or refine location**: draggable marker or tap-to-place, showing **latitude / longitude** (WGS84). Persist coordinates with the client record when saved.
+  - Optional: geocode address → map center; reverse geocode pin → suggested address line (library or provider-dependent).
+- **Employee app (and admin job context)**
+  - For jobs the employee is assigned to, show the **client’s address** and **coordinates** when present.
+  - **Embedded map** (read-only marker) so crew can open directions in the device maps app (link out) without leaving HavenOps.
+- **Implementation notes**
+  - Shared **map component** (client: interactive picker; staff: read-only) to keep styling consistent with the UI kit.
+  - Respect **privacy**: only expose coordinates to roles that already see that client via job scope (employee: assigned jobs; admin: full directory / job rows).
+
+### 8. UX & responsiveness (done)
 
 - **Responsive typography** and form controls (mobile-first; `16px` inputs on small screens to reduce iOS zoom)
 - **Tables:** desktop table / **stacked cards** below `md` (`TableDesktop`, `TableMobileList`, `DataField` — Jobs, Clients, Employees)
@@ -101,6 +117,7 @@ HavenOps is a single-tenant home service management system designed for a cleani
 ### clients
 
 - `id` (uuid), `name`, `phone`, `address`, `created_at`
+- **(Planned)** `latitude`, `longitude` (nullable floats, WGS84) — set from client portal map picker; used for employee/admin map views and future routing
 
 ### employees
 
@@ -136,6 +153,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 - `POST /api/clients` — **403** (self-service registration only)
 - `GET /api/clients` — scoped by role
+- **(Planned)** `PATCH /api/clients/me` or `PATCH /api/clients/{id}` — **client** may update own **`address`**, **`latitude`**, **`longitude`** (validate ranges; optional admin override later). Responses include coordinates when present so the portal and job views can render maps.
 
 ### Employees
 
@@ -185,15 +203,17 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Pages
 
+- Organized under **`pages/marketing`**, **`pages/auth/login|register|recovery`**, **`pages/admin`**, **`pages/employee`**, **`pages/client`** — each default export **lazy-imported** from `App.tsx` for smaller initial bundle
 - **`LandingPage`** (`/`)
 - `Dashboard`, `JobsPage`, `ClientsPage`, `EmployeesPage` (admin; nested under `/dashboard`)
-- `EmployeeApp`, `ClientPortal`
-- `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`
+- `EmployeeApp`, `ClientPortal` (planned: **client location / map** editor on portal; **job-level map** for employees)
+- `LoginPage` (chooser), `ClientLoginPage`, `EmployeeLoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`
 
 ### Components
 
 - **`BookingForm`** (client portal only; primary submit **`highlight`** / gold)
 - **`JobTable`** (admin / employee / client modes + responsive list)
+- **(Planned)** **`LocationMap`** / **`ClientLocationEditor`** — map library wrapper; client portal **picker** + employee **read-only** job/client location; optional **`AddressFields`** shared with registration
 - **`Modal`**, **`ThemeSync`**, **`ThemePreferenceControl`**
 - **`AdminShell`** (desktop sidebar + mobile app bar / bottom nav / account sheet); nav config includes **`icon`** + **`mobileLabel`**
 - `RequireAuth`, role gates in `App.tsx`
@@ -202,8 +222,13 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 ### State
 
 - **`authStore`:** token, user, login/register/logout, `roleHome` (admin → `/dashboard`)
-- **`havenopsStore`:** lists refresh for admin workflows
+- **`havenopsStore`:** lists refresh for admin workflows (**today**); **(planned)** superseded or thinned in favor of **TanStack Query** query keys + `invalidateQueries` after mutations
 - **`themeStore`:** `light` | `dark` | `system`, persisted
+
+### Data fetching (planned)
+
+- **TanStack Query** as the standard for anything that talks to **`/api`**: shared **`queryClient`** config (stale time, retry), **`useQuery`** for GET-style data, **`useMutation`** + **`onSuccess` invalidation** for PATCH/POST flows (e.g. job status, assign, booking)
+- **`api.ts`** functions remain thin fetch wrappers; hooks (or small `queries/` modules) compose them with React Query
 
 ---
 
@@ -229,6 +254,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 ### Phase 5 – Centralized UI, tooling & product polish — **done**
 
 - Tailwind v4, UI primitives, theme tokens, Makefile
+- **Lazy route imports** (`React.lazy` + `Suspense`) and **pages/** layout by area (marketing, auth, admin, employee, client)
 - **Self-service clients only** + **client-only booking** (API + UI)
 - **Schedule-aware** assignment + **queued** pending jobs
 - **Demo seed** (`HAVENOPS_SEED_DEMO`)
@@ -236,6 +262,12 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 - **Light/dark/system** theme + **cleaning brand** palette
 - **Mobile-native-style** shell (bottom nav, sheet, safe areas)
 - **Modal** add-employee; **PageHeader** brand accent
+
+### Phase 5b – TanStack Query (planned)
+
+- Add **`@tanstack/react-query`**, `QueryClientProvider`, Devtools (dev only, optional)
+- Port **admin** list views and **mutations** (job assign/status, employee create/toggle, booking) from **`havenopsStore`** to **`useQuery` / `useMutation`**; align **`EmployeeApp` / `ClientPortal`** direct **`api.ts`** calls with the same pattern where useful
+- Tests: wrap render helpers with a test **`QueryClientProvider`**
 
 ### Phase 6 – Persistence
 
@@ -249,6 +281,12 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 - Calendar UI, notifications, rate limiting, offline support, automated retry for queued assignments
 
+### Phase 9 – Client location & maps (planned)
+
+- Backend: extend **`clients`** with **`latitude`** / **`longitude`**; authenticated **client** `PATCH` for address + coordinates; include coords in job/client payloads where role allows
+- Frontend: **map library** dependency, env for any provider keys; **client portal** section to set home address + map pin; **employee** (and admin) job UI showing **client address + map** when coordinates exist
+- Tests: API validation for geo bounds; smoke tests for map mount (optional mock)
+
 ---
 
 ## Testing strategy
@@ -259,7 +297,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ### Frontend
 
-- `npm run test` / `npm run test:run` — Vitest (API module, store, landing + login smoke routing)
+- `npm run test` / `npm run test:run` — Vitest (API module, store, landing + login smoke routing); **(planned)** React Query test utilities when Phase 5b lands
 
 ---
 
@@ -288,7 +326,7 @@ All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
 
 ## Future enhancements
 
-- GPS-based assignment, route optimization
+- **GPS-based assignment** and **route optimization** (builds on stored client coordinates and crew locations)
 - SMS / email (recovery, notifications)
 - Payments, multi-tenant
 
