@@ -78,8 +78,9 @@ html[data-theme="light"] {
 }
 
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  /* Loaded from Google Fonts in index.html (variable Inter + Google Sans) */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Google Sans", ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--ho-background);
   --color-surface: var(--ho-surface);
