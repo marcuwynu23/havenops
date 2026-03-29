@@ -170,7 +170,10 @@ func TestPatchClientMe_AdminForbidden(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPatch, srv.URL+"/clients/me", bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusForbidden {
 		t.Fatalf("expected 403, got %d", res.StatusCode)
