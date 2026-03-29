@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
+import type { Role } from "../../../types/auth";
 import { SignInForm } from "./SignInForm";
+
+const CLIENT_LOGIN_ROLES: Role[] = ["client"];
 
 export default function ClientLoginPage() {
   return (
     <SignInForm
+      allowedRoles={CLIENT_LOGIN_ROLES}
+      brandLinkToHome
       title="Client sign in"
       description="Access your bookings and job updates."
       footer={
