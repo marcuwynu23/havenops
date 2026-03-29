@@ -1,142 +1,59 @@
 # HavenOps
 
-HavenOps is a **single-tenant** operations app for a residential cleaning business: **client self-registration and booking**, **schedule-aware auto-assignment** to staff, **job status** tracking, and **admin** tools for employees and the client directory.
+*A cleaner experience—for your customers and your operations.*
 
-The web app separates a **public marketing** site (`/`) from the **authenticated** admin (`/dashboard`), employee (`/app`), and client (`/portal`) experiences.
-
----
-
-## Stack
-
-| Area | Technology |
-|------|------------|
-| **Frontend** | React 19, TypeScript, Vite 8, React Router 7, Tailwind CSS v4, TanStack Query, Zustand (auth + theme) |
-| **Backend** | Go, Chi router, JWT (HS256), bcrypt, SQLite (`modernc.org/sqlite`) |
-
-See **`PLAN.md`** for the full roadmap, data model, API summary, and phased delivery notes.
+**HavenOps** is a **software management system** for **booking** and **workforce** management: clients schedule service online, **HavenOps employees** (your crew and leads) see assignments and update job status, and the office coordinates everyone in one place—without chasing texts and spreadsheets.
 
 ---
 
-## Repository layout
+## What HavenOps helps you do
 
-```
-havenops/
-├── backend/          # Go API (cmd/server, internal/, Makefile)
-├── frontend/         # Vite React SPA
-└── PLAN.md           # Product & technical plan
-```
+### For homeowners
 
----
+- **Book in minutes** — Pick a time that fits their life; they see what’s scheduled and when the job is done.
+- **Clear expectations** — Recurring and one-time visits, with room for special notes so your team shows up ready.
+- **Stay in the loop** — They can follow status from booked through completed, so there’s less “where are you?” back-and-forth.
 
-## Prerequisites
+### What a typical visit emphasizes
 
-- **Go** 1.22+ (for the API)
-- **Node.js** 20+ and **npm** (for the SPA)
-- Optional: **GNU Make** (Git Bash / MSYS2 / WSL on Windows) to use `backend/Makefile` targets; you can run the same commands with `go` directly.
+- Kitchen and baths detailed  
+- Floors vacuumed and mopped  
+- Dusting and surfaces wiped  
 
----
+*(You can reflect your real checklist in how you train your team; the product is built to support consistent, repeatable service.)*
 
-## Quick start
+### For your cleaning team
 
-### 1. API (port `8080` by default)
+- **Today’s work in one place** — See assigned jobs, update progress in the field, and keep the office informed without paperwork in the driveway.
 
-```bash
-cd backend
-go run ./cmd/server
-```
+### For the office
 
-Or, with Make:
-
-```bash
-cd backend
-make run
-```
-
-**Optional demo data** (sample clients, employees, jobs, and users):
-
-```bash
-# Unix-style shell
-HAVENOPS_SEED_DEMO=1 make run
-```
-
-On Windows **PowerShell**:
-
-```powershell
-cd backend
-$env:HAVENOPS_SEED_DEMO="1"; go run ./cmd/server
-```
-
-When demo seed is enabled, demo users share the password **`havenops123`** (see `backend/Makefile` / server logs).
-
-### 2. Frontend (dev server + API proxy)
-
-In another terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Vite proxies **`/api`** to **`http://127.0.0.1:8080`**, so open the URL Vite prints (usually `http://localhost:5173`) and use the app against your local API.
-
-### 3. Production-style build (frontend)
-
-```bash
-cd frontend
-npm run build
-npm run preview   # optional: serve dist/
-```
+- **Client directory** — See who you serve and how to reach them.  
+- **Jobs in one place** — When clients book online, everything lands in one list; assign or reassign when needed.  
+- **Staff setup** — Add employees and get them signed in so they only see their own work.
 
 ---
 
-## Environment variables (backend)
+## Trust and positioning
 
-| Variable | Purpose |
-|----------|---------|
-| `PORT` | Listen port (default **8080**) |
-| `HAVENOPS_JWT_SECRET` | **Required in production** — signing key for access tokens |
-| `HAVENOPS_SQLITE_PATH` | SQLite database file (default **`havenops.db`** in the process working directory) |
-| `HAVENOPS_ADMIN_EMAIL` / `HAVENOPS_ADMIN_PASSWORD` | First-run **admin** seed; if both unset, defaults to `admin@havenops.local` / `havenops123` |
-| `HAVENOPS_SEED_DEMO` | Set to `1` to load demo clients, employees, jobs, and users |
-| `HAVENOPS_EXPOSE_RECOVERY_TOKEN` | Dev-only: include recovery token in password-reset API JSON for testing |
+HavenOps fits businesses that care about **respect for the home and the customer’s time**—the same story you’d tell on your marketing site: insured, vetted team, supplies and standards your customers notice.
 
 ---
 
-## Testing
+## Who uses which part of the app
 
-**Backend**
-
-```bash
-cd backend
-go test ./...
-# or: make test
-```
-
-**Frontend**
-
-```bash
-cd frontend
-npm run test      # watch mode
-npm run test:run  # single run (e.g. CI)
-```
+| Who | What they use |
+|-----|----------------|
+| **New clients** | Create an account and book a clean |
+| **Returning clients** | Sign in to book again and track jobs |
+| **Cleaners & leads** | Sign in to see assignments and update job status |
+| **Office / admin** | Sign in to manage jobs, clients, and team |
 
 ---
 
-## Roles & main routes
+## Documentation for builders
 
-| Role | Typical entry | Routes |
-|------|----------------|--------|
-| **Guest** | Landing | `/`, `/login`, `/login/client`, `/login/employee`, `/register`, password recovery |
-| **Admin** | Staff sign-in | `/dashboard`, `/dashboard/jobs`, `/dashboard/clients`, `/dashboard/employees` |
-| **Employee** | Staff sign-in | `/app` |
-| **Client** | Client sign-in / register | `/portal` |
-
----
-
-## Documentation
-
-- **`PLAN.md`** — features, API outline, phases, testing strategy, deployment notes.
+If you’re **developing or hosting** HavenOps yourself, see **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** for setup, configuration, tests, and technical structure. Product roadmap and deeper technical notes live in **`PLAN.md`**.
 
 ---
 
