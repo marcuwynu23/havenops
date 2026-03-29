@@ -1,232 +1,313 @@
 # HavenOps – Full Development Plan
 
 ## Overview
+
 HavenOps is a single-tenant home service management system designed for a cleaning business. It includes client booking, automated employee assignment, scheduling, and job tracking across web, mobile, and desktop platforms.
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- React (Vite)
-- TypeScript
-- Capacitor (Android)
-- Electron (Windows Desktop)
+### Frontend (current)
 
-### Backend
-- Go (Chi Router)
-- REST API
-- SQLite (initial) → PostgreSQL (future)
+- React 19 + TypeScript (Vite 8)
+- React Router 7
+- Tailwind CSS v4 with `@tailwindcss/vite`
+- Zustand: **`authStore`**, **`havenopsStore`**, **`themeStore`** (appearance preference + `localStorage`)
+- Vitest + Testing Library + jsdom
+- Centralized UI kit under `frontend/src/components/ui` (Button variants including **`highlight`**, Card, Field, Input, Select, Textarea, Table, Badge, Alert, PageHeader, StatCard, StatsGrid, FormGrid, RowActions, Muted, responsive table helpers, etc.)
+- **Brand theme** in `frontend/src/styles/theme.css`: cleaning-service palette (**`#1e1e1e`**, **`#e5e5e5`**, **`#618b79`**, **`#f9d249`**) with **light** and **dark** modes via `html[data-theme]`; tokens include `highlight`, `nav-hover`, `backdrop`, job status colors
+- **`ThemeSync`** + inline script in `index.html` to avoid theme flash; preference **Light / Dark / System** (`localStorage` key `havenops-theme-preference`)
+- **`ThemePreferenceControl`**: sidebar (authenticated) + fixed corner on auth pages
+- **`Modal`**: reusable dialog (portal, backdrop, Escape); **Add employee** flow uses it
+- **Layout:** **`AdminShell`** — desktop sidebar with icons; **mobile** Material-style **top app bar**, **bottom navigation** (multi-tab admin; single-role + **Account** tab), **account bottom sheet** (theme, email, logout); safe-area aware
+- **Public marketing `LandingPage`** at **`/`** (hero, feature cards, CTAs to register / staff login); signed-in users are redirected to `roleHome`
+- **`RequireAuth`**, role gates in `App.tsx` (`AdminGate`, `EmployeeGate`, `ClientGate`); admin app lives under **`/dashboard`**
+
+### Frontend (planned)
+
+- Capacitor (Android)
+- Electron (Windows desktop)
+
+### Backend (current)
+
+- Go with Chi router
+- REST API mounted at **`/api`**
+- **In-memory store** implementing `store.Store` (`internal/store/memory.go`) — swap for SQLite/Postgres later without changing handler contracts
+- JWT access tokens (HS256), bcrypt passwords (`internal/auth`)
+- Optional first-run admin seed via environment variables
+- Optional **demo dataset**: **`HAVENOPS_SEED_DEMO=1`** — sample clients, employees, client user, jobs (`internal/bootstrap/seed_demo.go`); shared demo password documented in logs / Makefile
+- **Makefile** in `backend/` — `make help`, `run`, `test`, `fmt`, `vet`, `build`, `release` (cross-compile), `checksums`, etc. Run from `backend/`; on Windows use Git Bash, MSYS2, or WSL if `make` is unavailable and invoke the documented `go` commands instead.
+
+### Backend (planned)
+
+- SQLite (initial) → PostgreSQL (future), with migrations
 
 ---
 
 ## Core Features (MVP)
 
-### 1. Client Management
-- Create client
-- Store name, phone, address
-- View client list
+### 1. Authentication & roles
 
-### 2. Job Management
-- Create job
-- Assign service type
-- Schedule datetime
-- Track status:
-  - pending
-  - assigned
-  - in_progress
-  - done
-  - cancelled
+- **Roles:** `admin`, `employee`, `client`
+- **Client self-registration** (public): creates linked `User` + `Client` record
+- **Employee accounts** created only by **admin** (modal form on Employees page): email + initial password; links `User` ↔ `Employee`
+- **Login** (JWT Bearer on protected routes)
+- **Password recovery:** request token + reset (no outbound email in MVP; dev can use `HAVENOPS_EXPOSE_RECOVERY_TOKEN=1` to receive token in API JSON for testing)
+- **Environment:** `HAVENOPS_JWT_SECRET` (required in production), `HAVENOPS_ADMIN_EMAIL` / `HAVENOPS_ADMIN_PASSWORD` (optional seed admin), `HAVENOPS_EXPOSE_RECOVERY_TOKEN`, `HAVENOPS_SEED_DEMO`, `PORT`
 
-### 3. Employee Management
-- Create employee
-- Activate/deactivate employee
-- View employees
+### 2. Client management
 
-### 4. Auto Assignment System
-- Assign job automatically on creation
-- Strategy: Least busy employee
+- **No admin-created clients:** `POST /api/clients` returns **403**; clients come only from **self-service registration**
+- **Admin:** read-only **directory** (`GET /clients` — full list)
+- **Client:** sees only self; **only clients** may **`POST /jobs`** (booking) for own `client_id`
+- **Employee:** clients that appear on assigned jobs (scoped list)
 
-### 5. Employee App
-- View assigned jobs
-- Update job status
+### 3. Job management
 
-### 6. Admin Dashboard
-- View all jobs
-- Reassign jobs manually
-- Monitor operations
+- **Booking:** **client accounts only** (admin and employee cannot create jobs via API)
+- List/filter jobs by role (admin: all + manual assign; employee: assigned; client: own)
+- Track status: `pending` → `assigned` → `in_progress` → `done`; `cancelled` allowed
+- Admin: manual reassignment (`PATCH .../assign`)
+- **Queued jobs:** if no employee is free in the scheduled **time window** (default slot + padding), job stays **`pending`** until manual assign or capacity changes
+
+### 4. Employee management
+
+- Admin: create employee with credentials (modal), list, activate/deactivate (`PATCH`)
+
+### 5. Auto assignment
+
+- **Schedule-aware:** among **active** employees with **no overlapping** non-terminal jobs (slot duration + buffer), choose **least loaded**; ties by employee ID
+- If everyone overlaps that window → leave **unassigned** (queue)
+
+### 6. Surfaces
+
+- **Marketing landing:** **`/`** — product intro, client + staff entry points; unauthenticated unknown routes redirect to **`/`** (guests) or **`roleHome`** (signed-in)
+- **Admin console:** **`/dashboard`**, **`/dashboard/jobs`**, **`/dashboard/clients`**, **`/dashboard/employees`**
+- **Employee app:** `/app` — assigned jobs, status updates on assigned jobs only
+- **Client portal:** `/portal` — own jobs, **Request booking** (gold CTA)
+- **Public auth pages:** `/login`, `/register`, `/forgot-password`, `/reset-password`
+
+### 7. UX & responsiveness (done)
+
+- **Responsive typography** and form controls (mobile-first; `16px` inputs on small screens to reduce iOS zoom)
+- **Tables:** desktop table / **stacked cards** below `md` (`TableDesktop`, `TableMobileList`, `DataField` — Jobs, Clients, Employees)
+- **Theme:** light / dark / system; cleaning brand colors; **PageHeader** sage→gold accent bar
 
 ---
 
-## Database Schema
+## Data model (logical)
 
 ### clients
-- id (uuid)
-- name
-- phone
-- address
-- created_at
+
+- `id` (uuid), `name`, `phone`, `address`, `created_at`
 
 ### employees
-- id (uuid)
-- name
-- phone
-- is_active
-- created_at
+
+- `id` (uuid), `name`, `phone`, `is_active`, `created_at`
 
 ### jobs
-- id (uuid)
-- client_id (fk)
-- assigned_employee_id (fk)
-- service_type
-- scheduled_at
-- status
-- notes
-- created_at
+
+- `id` (uuid), `client_id`, `assigned_employee_id`, `service_type`, `scheduled_at`, `status`, `notes`, `created_at`
+
+### users (auth)
+
+- `id`, `email`, `password_hash`, `role`, optional `client_id` / `employee_id`, `created_at`
+- Recovery tokens stored in memory with consume-on-use semantics (replace with durable store + email in production)
 
 ---
 
-## API Endpoints
+## API (`/api/...`)
+
+All resource routes require **`Authorization: Bearer <jwt>`** unless noted.
+
+### Auth (public)
+
+- `POST /api/auth/register` — client signup
+- `POST /api/auth/login`
+- `POST /api/auth/recovery/request`
+- `POST /api/auth/recovery/reset`
+
+### Auth (protected)
+
+- `GET /api/auth/me`
 
 ### Clients
-- POST /clients
-- GET /clients
+
+- `POST /api/clients` — **403** (self-service registration only)
+- `GET /api/clients` — scoped by role
 
 ### Employees
-- POST /employees
-- GET /employees
+
+- `POST /api/employees` — admin only; body includes email + password for linked user account
+- `GET /api/employees`
+- `PATCH /api/employees/{id}`
 
 ### Jobs
-- POST /jobs
-- GET /jobs
-- GET /jobs?employee_id=
-- PATCH /jobs/:id/status
-- PATCH /jobs/:id/assign
+
+- `POST /api/jobs` — **client accounts only** (server sets `client_id`); admin/employee **403**
+- `GET /api/jobs` — query filters: `employee_id`, `client_id` as applicable to role
+- `PATCH /api/jobs/{id}/status`
+- `PATCH /api/jobs/{id}/assign` — admin-oriented reassignment
+
+### Other
+
+- `GET /health` — liveness (root router, not under `/api`)
 
 ---
 
-## Business Logic
+## Business logic
 
-### Auto Assignment
-- Filter active employees
-- Count active jobs per employee
-- Assign to employee with lowest count
+### Auto assignment
 
-### Status Flow
-- pending → assigned → in_progress → done
-- Can cancel anytime
+- Active employees only; **exclude** those **busy** in the new job’s time window (non-terminal jobs + default slot length + padding)
+- Among eligible, **minimum active job count**; lexicographic tie-break on employee ID
+- No eligible employee → job remains **pending**
 
-### Constraints
-- Prevent overlapping schedules (future)
-- Add buffer time between jobs (future)
+### Status flow
+
+- `pending` → `assigned` → `in_progress` → `done`
+- Cancel anytime (`cancelled`)
+
+### Authorization (summary)
+
+- **Admin:** list/create employees; read clients; all jobs + **assign**; **no** job create, **no** client create via API
+- **Employee:** assigned jobs; status updates only on those; scoped clients list; **no** job create
+- **Client:** own jobs + **create** job (booking)
+
+### Future constraints
+
+- Overlapping schedules as first-class rules, buffer editor UI, background “retry assign” for queued jobs
 
 ---
 
-## Frontend Structure
+## Frontend structure
 
 ### Pages
-- Admin Dashboard
-- Clients Page
-- Jobs Page
-- Employees Page
-- Employee App (mobile)
+
+- **`LandingPage`** (`/`)
+- `Dashboard`, `JobsPage`, `ClientsPage`, `EmployeesPage` (admin; nested under `/dashboard`)
+- `EmployeeApp`, `ClientPortal`
+- `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`
 
 ### Components
-- BookingForm
-- JobList
-- CalendarView (future)
-- EmployeeJobList
+
+- **`BookingForm`** (client portal only; primary submit **`highlight`** / gold)
+- **`JobTable`** (admin / employee / client modes + responsive list)
+- **`Modal`**, **`ThemeSync`**, **`ThemePreferenceControl`**
+- **`AdminShell`** (desktop sidebar + mobile app bar / bottom nav / account sheet); nav config includes **`icon`** + **`mobileLabel`**
+- `RequireAuth`, role gates in `App.tsx`
+- Reusable UI under `components/ui/` and **`components/layout/`**
+
+### State
+
+- **`authStore`:** token, user, login/register/logout, `roleHome` (admin → `/dashboard`)
+- **`havenopsStore`:** lists refresh for admin workflows
+- **`themeStore`:** `light` | `dark` | `system`, persisted
 
 ---
 
-## Development Phases
+## Development phases
 
-### Phase 1 – Backend MVP
-- Setup Go server
-- Implement models
-- Create REST endpoints
-- Add in-memory store
-- Write tests
+### Phase 1 – Backend MVP — **done**
 
-### Phase 2 – Frontend MVP
-- Setup Vite React
-- Create booking form
-- Display job list
-- Connect API
+- Go server, Chi, models, REST under `/api`, in-memory `Store` interface + tests
 
-### Phase 3 – Employee System
-- Employee endpoints
-- Auto assignment logic
-- Employee job view
+### Phase 2 – Frontend MVP — **done**
 
-### Phase 4 – Persistence
-- Integrate SQLite
-- Add migrations
+- Vite React app, API client with Bearer token, job views, Vitest
+- **Public landing** at **`/`** (value proposition, register + staff sign-in); **admin shell** routes under **`/dashboard`** so marketing and app URLs stay separate
 
-### Phase 5 – Desktop & Mobile
-- Wrap with Electron
-- Integrate Capacitor
+### Phase 3 – Employee system — **done**
 
-### Phase 6 – Enhancements
-- Calendar UI
-- Notifications
-- Auth system
-- Offline support
+- Employee endpoints, auto-assignment, employee app route
+
+### Phase 4 – Auth & portals — **done**
+
+- JWT, bcrypt, registration (client), admin-provisioned employees, login, recovery, role-based API + UI, client portal
+
+### Phase 5 – Centralized UI, tooling & product polish — **done**
+
+- Tailwind v4, UI primitives, theme tokens, Makefile
+- **Self-service clients only** + **client-only booking** (API + UI)
+- **Schedule-aware** assignment + **queued** pending jobs
+- **Demo seed** (`HAVENOPS_SEED_DEMO`)
+- **Responsive** tables/typography/forms
+- **Light/dark/system** theme + **cleaning brand** palette
+- **Mobile-native-style** shell (bottom nav, sheet, safe areas)
+- **Modal** add-employee; **PageHeader** brand accent
+
+### Phase 6 – Persistence
+
+- SQLite + migrations (or Postgres), map `Store` to database
+
+### Phase 7 – Desktop & mobile
+
+- Electron, Capacitor
+
+### Phase 8 – Enhancements
+
+- Calendar UI, notifications, rate limiting, offline support, automated retry for queued assignments
 
 ---
 
-## Testing Strategy
+## Testing strategy
 
 ### Backend
-- Unit tests for handlers
-- Auto assignment tests
-- Edge cases (no employees, inactive employees)
+
+- `go test ./...` (handlers, assignment, bootstrap seed demo idempotency); optional `make test-race`
 
 ### Frontend
-- Component tests (Vitest)
-- API integration tests
+
+- `npm run test` / `npm run test:run` — Vitest (API module, store, landing + login smoke routing)
 
 ---
 
-## Security (Basic)
-- Token-based auth (admin + employee)
-- Input validation
-- Rate limiting (future)
+## Security
+
+- JWT Bearer for API; bcrypt for passwords
+- CORS allowlist for local Vite dev origins
+- Input validation on handlers; production must set `HAVENOPS_JWT_SECRET`
+- Rate limiting and audit logging — future
 
 ---
 
 ## Deployment
 
 ### Local
-- Docker Compose (API + DB)
+
+- Backend: `make run` or `go run ./cmd/server` from `backend/`; optional `HAVENOPS_SEED_DEMO=1`
+- Frontend: `npm run dev` from `frontend/`
+- Docker Compose (API + DB) — optional / future when DB lands
 
 ### Production
-- VPS hosting
-- Reverse proxy (NGINX)
+
+- VPS, reverse proxy (e.g. NGINX), secure secrets, disable recovery token exposure
 
 ---
 
-## Future Enhancements
-- GPS-based assignment
-- Route optimization
-- SMS notifications
-- Payment integration
-- Multi-tenant support
+## Future enhancements
+
+- GPS-based assignment, route optimization
+- SMS / email (recovery, notifications)
+- Payments, multi-tenant
 
 ---
 
-## Definition of Done (MVP)
-- Can create client
-- Can create job
-- Job auto-assigns employee
-- Employee can view job
-- Employee can mark job done
-- Admin can monitor all jobs
+## Definition of done (MVP)
+
+- Admin manages **employees** (modal create with credentials); **views** client directory; manages **all jobs** and **reassigns**; **no** admin client or job creation
+- Clients **self-register** and use the portal to **book** (gold CTA) and track jobs
+- Jobs **auto-assign** when an employee is **free** in the slot; otherwise stay **pending**
+- Employees sign in, see **assigned** work, update status; **mobile-friendly** shell and **theme** toggle
+- Auth flows end-to-end; recovery token delivery TBD outside dev
+- **Demo seed** optional for local demos; Makefile supports backend **build/test/release**
+- **Landing** introduces the product; **logout** returns guests to **`/`**
 
 ---
 
 ## Notes
-- Keep system simple and fast
-- Avoid overengineering
-- Focus on real business usage
 
+- Keep the system simple and fast; avoid overengineering for the single-tenant MVP
+- In-memory store: process restart loses data until Phase 6 persistence
+- Focus on real business usage; Capacitor/Electron follow after web + persistence are stable
