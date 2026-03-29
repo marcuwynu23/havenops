@@ -11,7 +11,7 @@ The web app separates a **public marketing** site (`/`) from the **authenticated
 | Area | Technology |
 |------|------------|
 | **Frontend** | React 19, TypeScript, Vite 8, React Router 7, Tailwind CSS v4, TanStack Query, Zustand (auth + theme) |
-| **Backend** | Go, Chi router, JWT (HS256), bcrypt, in-memory store (swappable for SQLite/Postgres later) |
+| **Backend** | Go, Chi router, JWT (HS256), bcrypt, SQLite (`modernc.org/sqlite`) |
 
 See **`PLAN.md`** for the full roadmap, data model, API summary, and phased delivery notes.
 
@@ -96,7 +96,8 @@ npm run preview   # optional: serve dist/
 |----------|---------|
 | `PORT` | Listen port (default **8080**) |
 | `HAVENOPS_JWT_SECRET` | **Required in production** — signing key for access tokens |
-| `HAVENOPS_ADMIN_EMAIL` / `HAVENOPS_ADMIN_PASSWORD` | Optional first-run **admin** user seed |
+| `HAVENOPS_SQLITE_PATH` | SQLite database file (default **`havenops.db`** in the process working directory) |
+| `HAVENOPS_ADMIN_EMAIL` / `HAVENOPS_ADMIN_PASSWORD` | First-run **admin** seed; if both unset, defaults to `admin@havenops.local` / `havenops123` |
 | `HAVENOPS_SEED_DEMO` | Set to `1` to load demo clients, employees, jobs, and users |
 | `HAVENOPS_EXPOSE_RECOVERY_TOKEN` | Dev-only: include recovery token in password-reset API JSON for testing |
 
