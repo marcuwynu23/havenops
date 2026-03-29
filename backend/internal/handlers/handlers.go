@@ -38,6 +38,8 @@ func (a *API) Routes() chi.Router {
 		pr.Post("/clients", a.postClient)
 		pr.Get("/clients", a.getClients)
 		pr.Patch("/clients/me", a.patchClientMe)
+		pr.Get("/geocode/forward", a.getGeocodeForward)
+		pr.Get("/geocode/reverse", a.getGeocodeReverse)
 		pr.Post("/employees", a.postEmployee)
 		pr.Get("/employees", a.getEmployees)
 		pr.Patch("/employees/{id}", a.patchEmployee)
