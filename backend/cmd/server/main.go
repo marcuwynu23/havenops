@@ -23,43 +23,27 @@ func main() {
 		addr = ":" + v
 	}
 
-	var st store.Store
-	sqliteMode := false
-	if os.Getenv("HAVENOPS_USE_MEMORY") == "1" {
-		st = store.NewMemory()
-	} else {
-		sqliteMode = true
-		path := os.Getenv("HAVENOPS_SQLITE_PATH")
-		if path == "" {
-			path = "havenops.db"
-		}
-		sqlite, err := store.OpenSQLite(path)
-		if err != nil {
-			log.Fatalf("sqlite: %v", err)
-		}
-		defer func() { _ = sqlite.Close() }()
-		st = sqlite
-		log.Printf("using SQLite store at %s", path)
+	path := os.Getenv("HAVENOPS_SQLITE_PATH")
+	if path == "" {
+		path = "havenops.db"
 	}
-
-	adminEmail := os.Getenv("HAVENOPS_ADMIN_EMAIL")
-	adminPass := os.Getenv("HAVENOPS_ADMIN_PASSWORD")
-	if sqliteMode && adminEmail == "" && adminPass == "" {
-		adminEmail = bootstrap.DefaultSQLiteAdminEmail
-		adminPass = bootstrap.DefaultSQLiteAdminPassword
-		log.Printf("SQLite: seeding default admin %q (set HAVENOPS_ADMIN_EMAIL and HAVENOPS_ADMIN_PASSWORD to override)", adminEmail)
+	db, err := store.OpenSQLite(path)
+	if err != nil {
+		log.Fatalf("sqlite: %v", err)
 	}
+	defer func() { _ = db.Close() }()
+	log.Printf("using SQLite store at %s", path)
 
-	if err := bootstrap.SeedAdmin(st, adminEmail, adminPass); err != nil {
+	if err := bootstrap.EnsureAdminFromEnv(db); err != nil {
 		log.Fatalf("seed admin: %v", err)
 	}
 	if os.Getenv("HAVENOPS_SEED_DEMO") == "1" {
-		if err := bootstrap.SeedDemo(st); err != nil {
+		if err := bootstrap.SeedDemo(db); err != nil {
 			log.Fatalf("seed demo: %v", err)
 		}
 	}
 	api := &handlers.API{
-		Store:               st,
+		Store:               db,
 		JWTSecret:           os.Getenv("HAVENOPS_JWT_SECRET"),
 		ExposeRecoveryToken: os.Getenv("HAVENOPS_EXPOSE_RECOVERY_TOKEN") == "1",
 	}
