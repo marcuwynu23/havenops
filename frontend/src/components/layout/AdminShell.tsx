@@ -16,7 +16,8 @@ export type NavIcon =
   | "team"
   | "list"
   | "booking"
-  | "location";
+  | "location"
+  | "account";
 
 export type NavItemConfig = {
   to: string;
@@ -101,6 +102,17 @@ function iconPaths(name: NavIcon): ReactNode {
           strokeLinejoin="round"
           strokeWidth={1.75}
           d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z"
+          className={common}
+          fill="none"
+        />
+      );
+    case "account":
+      return (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M20 21a8 8 0 1 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
           className={common}
           fill="none"
         />

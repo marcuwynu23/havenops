@@ -38,6 +38,7 @@ const ClientPortal = lazy(() => import("./pages/client/ClientPortal"));
 const ClientLocationPage = lazy(
   () => import("./pages/client/ClientLocationPage"),
 );
+const ProfilePage = lazy(() => import("./pages/account/ProfilePage"));
 
 const ADMIN_NAV: NavItemConfig[] = [
   {
@@ -60,10 +61,22 @@ const ADMIN_NAV: NavItemConfig[] = [
     mobileLabel: "Team",
     icon: "team",
   },
+  {
+    to: "/dashboard/profile",
+    label: "Profile",
+    mobileLabel: "Account",
+    icon: "account",
+  },
 ];
 
 const EMPLOYEE_NAV: NavItemConfig[] = [
   { to: "/app", label: "My jobs", mobileLabel: "Jobs", icon: "list", end: true },
+  {
+    to: "/app/profile",
+    label: "Profile",
+    mobileLabel: "Account",
+    icon: "account",
+  },
 ];
 
 const CLIENT_NAV: NavItemConfig[] = [
@@ -79,6 +92,13 @@ const CLIENT_NAV: NavItemConfig[] = [
     label: "Location",
     mobileLabel: "Location",
     icon: "location",
+    end: true,
+  },
+  {
+    to: "/portal/profile",
+    label: "Profile",
+    mobileLabel: "Account",
+    icon: "account",
     end: true,
   },
 ];
@@ -194,13 +214,16 @@ export default function App() {
             <Route path="jobs" element={<JobsPage />} />
             <Route path="clients" element={<ClientsPage />} />
             <Route path="employees" element={<EmployeesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
           <Route path="/app" element={<EmployeeGate />}>
             <Route index element={<EmployeeApp />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
           <Route path="/portal" element={<ClientGate />}>
             <Route index element={<ClientPortal />} />
             <Route path="location" element={<ClientLocationPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
 
