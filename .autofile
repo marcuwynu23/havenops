@@ -1,0 +1,4 @@
+dev {
+  + cd backend && make run
+  + cd frontend && npm run dev
+}
